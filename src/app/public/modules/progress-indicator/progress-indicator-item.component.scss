@@ -1,8 +1,6 @@
 @import "~@skyux/theme/scss/mixins";
 @import "~@skyux/theme/scss/_compat/mixins";
-
-$icon-offset: 1px;
-$timeline-width: 15px;
+@import "./progress-indicator-variables";
 
 .sky-progress-indicator-item {
   display: flex;
@@ -23,63 +21,9 @@ $timeline-width: 15px;
   margin-left: -$timeline-width * 2;
 }
 
-.sky-progress-indicator-item-timeline {
-  display: flex;
-  flex-basis: $timeline-width;
-  flex-direction: column;
-  flex-grow: 0;
-  margin-right: $timeline-width;
-}
-
-.sky-progress-indicator-item-timeline-icon {
-  border-radius: $timeline-width;
-  border: 2px solid $sky-border-color-neutral-medium;
-  flex: 0 0 $timeline-width;
-  margin-top: $icon-offset;
-  width: $timeline-width;
-}
-
-.sky-progress-indicator-item-timeline-line {
-  background-color: $sky-border-color-neutral-medium;
-  flex: 1 0 auto;
-  margin: 0 auto;
-  width: 1px;
-}
-
 /**
  * STATUS
  */
-.sky-progress-indicator-item-status-active {
-  .sky-progress-indicator-item-timeline-icon {
-    background-color: $sky-highlight-color-success;
-    border-color: transparent;
-  }
-}
-
-.sky-progress-indicator-item-status-pending {
-  .sky-progress-indicator-item-timeline-icon {
-    border-color: $sky-highlight-color-success;
-  }
-}
-
-.sky-progress-indicator-item-status-complete {
-  .sky-progress-indicator-item-timeline-icon {
-    border-color: transparent;
-    color: $sky-highlight-color-success;
-    margin-top: 0;
-
-    > ::ng-deep sky-icon {
-      display: inline-flex;
-      margin-left: -1px;
-      vertical-align: top;
-    }
-  }
-
-  .sky-progress-indicator-item-timeline-line {
-    background-color: $sky-highlight-color-success;
-  }
-}
-
 .sky-progress-indicator-item-status-incomplete {
   // Incomplete items should have reduced height.
   .sky-progress-indicator-item-content {

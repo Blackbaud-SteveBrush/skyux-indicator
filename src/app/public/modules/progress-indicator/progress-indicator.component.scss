@@ -2,7 +2,7 @@
   ::ng-deep {
     sky-progress-indicator-item:last-of-type {
       // Hide the last item's line.
-      .sky-progress-indicator-item-timeline-line {
+      .sky-progress-indicator-timeline-line {
         display: none;
       }
     }

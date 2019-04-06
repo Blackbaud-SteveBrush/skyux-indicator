@@ -2,15 +2,10 @@
   class="sky-progress-indicator-item"
   [ngClass]="cssClassNames"
 >
-  <div *ngIf="showTimeline"
-    class="sky-progress-indicator-item-timeline"
-    role="presentation"
+  <sky-progress-indicator-timeline *ngIf="showTimeline"
+    [status]="status"
   >
-    <div class="sky-progress-indicator-item-timeline-icon">
-      <sky-icon *ngIf="statusName === 'complete'" icon="check"></sky-icon>
-    </div>
-    <div class="sky-progress-indicator-item-timeline-line"></div>
-  </div>
+  </sky-progress-indicator-timeline>
 
   <div class="sky-progress-indicator-item-main">
     <div
