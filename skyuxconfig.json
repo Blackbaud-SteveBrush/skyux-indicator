@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/@skyux/config/skyuxconfig-schema.json",
+  "mode": "easy",
+  "compileMode": "aot",
+  "plugins": [
+    "@skyux-sdk/builder-plugin-skyux"
+  ],
+  "app": {
+    "styles": [
+      "src/app/visual-styles.scss"
+    ]
+  },
+  "appSettings": {
+    "myLibrary": {
+      "name": "My Library"
+    }
+  },
+  "testSettings": {
+    "unit": {
+      "browserSet": "paranoid"
+    }
+  }
+}

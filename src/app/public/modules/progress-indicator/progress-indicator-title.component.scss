@@ -1,0 +1,8 @@
+@import "~@skyux/theme/scss/mixins";
+@import "~@skyux/theme/scss/_compat/mixins";
+
+.sky-progress-indicator-title {
+  line-height: 1.1;
+  margin: 1em 0;
+  text-align: center;
+}

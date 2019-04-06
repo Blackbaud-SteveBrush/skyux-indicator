@@ -1,0 +1,22 @@
+.sky-progress-indicator {
+  ::ng-deep {
+    sky-progress-indicator-item:last-of-type {
+      // Hide the last item's line.
+      .sky-progress-indicator-item-timeline-line {
+        display: none;
+      }
+    }
+
+    .sky-progress-indicator-reset-button {
+      text-align: center;
+    }
+  }
+}
+
+.sky-progress-indicator-mode-horizontal {}
+
+.sky-progress-indicator-mode-vertical {
+  max-width: 400px;
+  min-width: 250px;
+  margin: 0 auto;
+}

@@ -1,0 +1,210 @@
+<h2>
+  Vertical mode
+</h2>
+
+<div>
+  <sky-progress-indicator
+    [messageStream]="messageStream"
+    [startingIndex]="2"
+    (finished)="onFinished()"
+    (progressChanges)="onProgressChanges($event)"
+    #verticalIndicator
+  >
+    <sky-progress-indicator-title>
+      Setup my connection
+    </sky-progress-indicator-title>
+
+    <sky-progress-indicator-item
+      title="Configure connection"
+    >
+      <button
+        class="sky-btn sky-btn-link"
+        type="button"
+      >
+        Edit connection
+      </button>
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-item
+      title="Select remote server"
+    >
+      <button
+        class="sky-btn sky-btn-link"
+        type="button"
+      >
+        Change server
+      </button>
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-item
+      title="Test connection"
+    >
+      <button
+        class="sky-btn sky-btn-primary"
+        type="button"
+      >
+        Test connection
+      </button>
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-item
+      title="Turn on connection"
+    >
+      Content 4
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-reset-button>
+      Erase all settings
+    </sky-progress-indicator-reset-button>
+  </sky-progress-indicator>
+
+  <sky-progress-indicator-nav-button
+    buttonType="previous"
+    [progressIndicator]="verticalIndicator"
+  >
+  </sky-progress-indicator-nav-button>
+
+  <sky-progress-indicator-nav-button
+    buttonType="next"
+    [progressIndicator]="verticalIndicator"
+  >
+  </sky-progress-indicator-nav-button>
+
+  <sky-progress-indicator-nav-button
+    buttonType="finish"
+    [progressIndicator]="verticalIndicator"
+  >
+  </sky-progress-indicator-nav-button>
+
+  <sky-progress-indicator-nav-button
+    buttonType="reset"
+    buttonText="Erase all settings"
+    [progressIndicator]="verticalIndicator"
+  >
+  </sky-progress-indicator-nav-button>
+</div>
+
+<h2>
+  Custom buttons
+</h2>
+
+<p>
+  <button
+    class="sky-btn"
+    type="button"
+    (click)="onPreviousClick()"
+  >
+    Previous
+  </button>
+
+  <button
+    class="sky-btn sky-btn-primary"
+    type="button"
+    (click)="onNextClick()"
+  >
+    Next
+  </button>
+</p>
+
+<h2>
+  Horizontal mode
+</h2>
+
+<sky-progress-indicator
+  displayMode="horizontal"
+  [messageStream]="messageStreamHorizontal"
+  (finished)="onFinished()"
+  #horizontalIndicator
+>
+  <sky-progress-indicator-item
+    title="Configure connection"
+  >
+    Content 1
+  </sky-progress-indicator-item>
+
+  <sky-progress-indicator-item
+    title="Select remote server"
+  >
+    Content 2
+  </sky-progress-indicator-item>
+
+  <sky-progress-indicator-item
+    title="Test connection"
+  >
+    Content 3
+  </sky-progress-indicator-item>
+
+  <sky-progress-indicator-item
+    title="Turn on connection"
+  >
+    Content 4
+  </sky-progress-indicator-item>
+</sky-progress-indicator>
+
+<sky-progress-indicator-nav-button
+  buttonType="previous"
+  [progressIndicator]="horizontalIndicator"
+>
+</sky-progress-indicator-nav-button>
+
+<sky-progress-indicator-nav-button
+  buttonType="next"
+  [progressIndicator]="horizontalIndicator"
+>
+</sky-progress-indicator-nav-button>
+
+<sky-progress-indicator-nav-button
+  buttonType="finish"
+  [progressIndicator]="horizontalIndicator"
+>
+</sky-progress-indicator-nav-button>
+
+<sky-progress-indicator-nav-button
+  buttonType="reset"
+  buttonText="Erase all settings"
+  [progressIndicator]="horizontalIndicator"
+>
+</sky-progress-indicator-nav-button>
+
+<h2>
+  Passive mode
+</h2>
+
+<button
+  class="sky-btn sky-btn-link"
+  skyPopoverPlacement="right"
+  type="button"
+  [skyPopover]="myPopover"
+>
+  In progress
+</button>
+
+<sky-popover #myPopover>
+  <sky-progress-indicator
+    [isPassive]="true"
+    [startingIndex]="1"
+  >
+    <sky-progress-indicator-item
+      title="Received (02-19-2003)"
+    >
+    </sky-progress-indicator-item>
+    <sky-progress-indicator-item
+      title="Awaiting approval"
+    >
+    </sky-progress-indicator-item>
+    <sky-progress-indicator-item
+      title=""
+    >
+    </sky-progress-indicator-item>
+  </sky-progress-indicator>
+</sky-popover>
+
+<h2>
+  Legacy components
+</h2>
+
+<sky-progress-indicator-reset-button
+  [progressIndicator]="verticalIndicator"
+>
+  Old reset button
+</sky-progress-indicator-reset-button>

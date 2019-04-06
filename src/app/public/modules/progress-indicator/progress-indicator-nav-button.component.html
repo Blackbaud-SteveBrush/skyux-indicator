@@ -1,0 +1,9 @@
+<button *ngIf="isVisible"
+  class="sky-btn"
+  type="button"
+  [disabled]="disabled"
+  [ngClass]="cssClassNames"
+  (click)="onClick()"
+>
+  {{ buttonText || buttonLabelResourceString | skyLibResources }}
+</button>

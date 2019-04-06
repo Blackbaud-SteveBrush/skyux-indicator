@@ -1,0 +1,30 @@
+<div *ngIf="isVisible"
+  class="sky-progress-indicator-item"
+  [ngClass]="'sky-progress-indicator-item-status-' + statusName"
+>
+  <div *ngIf="showTimeline"
+    class="sky-progress-indicator-item-timeline"
+    role="presentation"
+  >
+    <div class="sky-progress-indicator-item-timeline-icon">
+      <sky-icon *ngIf="statusName === 'complete'" icon="check"></sky-icon>
+    </div>
+    <div class="sky-progress-indicator-item-timeline-line"></div>
+  </div>
+
+  <div class="sky-progress-indicator-item-main">
+    <div
+      class="sky-progress-indicator-item-title"
+      role="heading"
+    >
+      {{ titlePrefix }}{{ title }}
+    </div>
+    <div
+      class="sky-progress-indicator-item-content"
+    >
+      <ng-template [ngIf]="statusName !== 'incomplete'">
+        <ng-content></ng-content>
+      </ng-template>
+    </div>
+  </div>
+</div>
