@@ -13,6 +13,16 @@ $timeline-width: 15px;
   flex: 1 1 auto;
 }
 
+.sky-progress-indicator-item-content {
+  min-height: $sky-margin-double;
+  padding-top: $sky-margin;
+  padding-bottom: $sky-margin-triple;
+  text-align: center;
+
+  // Accommodate the width of the timeline to make the content centered.
+  margin-left: -$timeline-width * 2;
+}
+
 .sky-progress-indicator-item-timeline {
   display: flex;
   flex-basis: $timeline-width;
@@ -36,20 +46,19 @@ $timeline-width: 15px;
   width: 1px;
 }
 
-.sky-progress-indicator-item-content {
-  min-height: $sky-margin-double;
-  padding-top: $sky-margin;
-  padding-bottom: $sky-margin-triple;
-  text-align: center;
-
-  // Accommodate the width of the timeline to make the content centered.
-  margin-left: -$timeline-width * 2;
-}
-
+/**
+ * STATUS
+ */
 .sky-progress-indicator-item-status-active {
   .sky-progress-indicator-item-timeline-icon {
     background-color: $sky-highlight-color-success;
     border-color: transparent;
+  }
+}
+
+.sky-progress-indicator-item-status-pending {
+  .sky-progress-indicator-item-timeline-icon {
+    border-color: $sky-highlight-color-success;
   }
 }
 
@@ -68,5 +77,12 @@ $timeline-width: 15px;
 
   .sky-progress-indicator-item-timeline-line {
     background-color: $sky-highlight-color-success;
+  }
+}
+
+.sky-progress-indicator-item-status-incomplete {
+  // Incomplete items should have reduced height.
+  .sky-progress-indicator-item-content {
+    padding: 0;
   }
 }

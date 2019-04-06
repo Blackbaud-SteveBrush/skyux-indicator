@@ -90,12 +90,16 @@ export class SkyProgressIndicatorComponent
     return this._finished;
   }
 
-  public get displayModeName(): string {
-    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
-      return 'vertical';
+  public get cssClassNames(): string {
+    const classNames = [
+      `sky-progress-indicator-mode-${this.displayModeName}`
+    ];
+
+    if (this.isPassive) {
+      classNames.push('sky-progress-indicator-passive');
     }
 
-    return 'horizontal';
+    return classNames.join(' ');
   }
 
   // This field was added to support legacy API.
@@ -120,6 +124,14 @@ export class SkyProgressIndicatorComponent
 
   private set activeIndex(value: number) {
     this._activeIndex = value;
+  }
+
+  private get displayModeName(): string {
+    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
+      return 'vertical';
+    }
+
+    return 'horizontal';
   }
 
   private _activeIndex: number;
@@ -181,6 +193,12 @@ export class SkyProgressIndicatorComponent
     this.updateSteps();
   }
 
+  private gotoStep(index: number): void {
+    this.activeIndex = index;
+    this.notifyChange();
+    this.updateSteps();
+  }
+
   private finishSteps(): void {
     this.itemComponents.forEach((component) => {
       component.status = SkyProgressIndicatorItemStatus.Complete;
@@ -190,7 +208,7 @@ export class SkyProgressIndicatorComponent
   }
 
   private resetSteps(): void {
-    this.activeIndex = this.startingIndex;
+    this.activeIndex = 0;
     this.notifyChange();
     this.updateSteps();
   }
@@ -210,26 +228,32 @@ export class SkyProgressIndicatorComponent
 
       // Set status.
       if (activeIndex === i) {
-        component.status = SkyProgressIndicatorItemStatus.Active;
+        if (isPassive) {
+          component.status = SkyProgressIndicatorItemStatus.Pending;
+        } else {
+          component.status = SkyProgressIndicatorItemStatus.Active;
+        }
       } else if (activeIndex > i) {
         component.status = SkyProgressIndicatorItemStatus.Complete;
       } else {
         component.status = SkyProgressIndicatorItemStatus.Incomplete;
       }
 
-      // Show or hide the timeline graphic?
+      // Show or hide the timeline graphic.
       component.showTimeline = isVertical;
 
-      // Show or hide the step number?
-      if (
-        isVertical &&
-        // This seems weird to me, that passive mode is really only disabling the title counter?
-        !isPassive
-      ) {
+      // Show or hide the step number.
+      if (isVertical && !isPassive) {
         component.showStepNumber(i + 1);
       } else {
         component.hideStepNumber();
       }
+
+      // If we're in passive mode, don't show titles for incomplete items.
+      component.showTitle = !(
+        isPassive &&
+        activeIndex < i
+      );
     });
   }
 
@@ -261,6 +285,17 @@ export class SkyProgressIndicatorComponent
 
       case SkyProgressIndicatorMessageType.Reset:
       this.resetSteps();
+      break;
+
+      case SkyProgressIndicatorMessageType.GoTo:
+      if (!value.data || value.data.stepIndex === undefined) {
+        console.warn(
+          'Please provide a step index to travel to!'
+        );
+        return;
+      }
+
+      this.gotoStep(value.data.stepIndex);
       break;
 
       default:

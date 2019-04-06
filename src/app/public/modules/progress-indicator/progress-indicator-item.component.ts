@@ -4,7 +4,10 @@ import {
   Component,
   Input
 } from '@angular/core';
-import { SkyProgressIndicatorItemStatus } from './progress-indicator-item-status';
+
+import {
+  SkyProgressIndicatorItemStatus
+} from './progress-indicator-item-status';
 
 @Component({
   selector: 'sky-progress-indicator-item',
@@ -15,6 +18,14 @@ import { SkyProgressIndicatorItemStatus } from './progress-indicator-item-status
 export class SkyProgressIndicatorItemComponent {
   @Input()
   public title: string;
+
+  public get cssClassNames(): string {
+    const classNames = [
+      `sky-progress-indicator-item-status-${this.statusName}`
+    ];
+
+    return classNames.join(' ');
+  }
 
   public set isVisible(value: boolean) {
     if (value === this._isVisible) {
@@ -28,8 +39,6 @@ export class SkyProgressIndicatorItemComponent {
   public get isVisible(): boolean {
     return this._isVisible || false;
   }
-
-  public showTimeline = true;
 
   public set status(value: SkyProgressIndicatorItemStatus) {
     if (value === this._status) {
@@ -61,22 +70,36 @@ export class SkyProgressIndicatorItemComponent {
     this.changeDetector.markForCheck();
   }
 
-  // Remove this!
   public get statusName(): string {
+    let name: string;
+
     switch (this.status) {
       case SkyProgressIndicatorItemStatus.Active:
-      return 'active';
+      name = 'active';
+      break;
 
       case SkyProgressIndicatorItemStatus.Complete:
-      return 'complete';
+      name = 'complete';
+      break;
 
       case SkyProgressIndicatorItemStatus.Incomplete:
-      return 'incomplete';
+      name = 'incomplete';
+      break;
+
+      case SkyProgressIndicatorItemStatus.Pending:
+      name = 'pending';
+      break;
 
       default:
-      return 'none';
+      name = 'none';
+      break;
     }
+
+    return name;
   }
+
+  public showTimeline = true;
+  public showTitle = true;
 
   private _isVisible: boolean;
   private _status: SkyProgressIndicatorItemStatus;

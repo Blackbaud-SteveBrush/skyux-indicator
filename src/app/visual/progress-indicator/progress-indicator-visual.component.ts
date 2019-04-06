@@ -37,4 +37,13 @@ export class SkyProgressIndicatorVisualComponent implements OnInit {
   public onProgressChanges(changes: SkyProgressIndicatorChange): void {
     console.log('changes:', changes);
   }
+
+  public onGoToClick(): void {
+    this.messageStream.next({
+      type: SkyProgressIndicatorMessageType.GoTo,
+      data: {
+        stepIndex: 0
+      }
+    });
+  }
 }

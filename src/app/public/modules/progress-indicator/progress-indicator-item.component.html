@@ -1,6 +1,6 @@
 <div *ngIf="isVisible"
   class="sky-progress-indicator-item"
-  [ngClass]="'sky-progress-indicator-item-status-' + statusName"
+  [ngClass]="cssClassNames"
 >
   <div *ngIf="showTimeline"
     class="sky-progress-indicator-item-timeline"
@@ -16,8 +16,12 @@
     <div
       class="sky-progress-indicator-item-title"
       role="heading"
+      [ngClass]="{ 'sky-deemphasized': statusName === 'pending' }"
     >
-      {{ titlePrefix }}{{ title }}
+      {{ titlePrefix }}
+      <ng-template [ngIf]="showTitle">
+        {{ title }}
+      </ng-template>
     </div>
     <div
       class="sky-progress-indicator-item-content"
