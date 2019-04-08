@@ -25,27 +25,27 @@ import 'rxjs/add/operator/takeUntil';
 
 import {
   SkyProgressIndicatorChange
-} from './progress-indicator-change';
+} from './types/progress-indicator-change';
 
 import {
   SkyProgressIndicatorDisplayMode
-} from './progress-indicator-display-mode';
+} from './types/progress-indicator-display-mode';
 
 import {
   SkyProgressIndicatorItemStatus
-} from './progress-indicator-item-status';
+} from './types/progress-indicator-item-status';
+
+import {
+  SkyProgressIndicatorMessage
+} from './types/progress-indicator-message';
+
+import {
+  SkyProgressIndicatorMessageType
+} from './types/progress-indicator-message-type';
 
 import {
   SkyProgressIndicatorItemComponent
 } from './progress-indicator-item.component';
-
-import {
-  SkyProgressIndicatorMessage
-} from './progress-indicator-message';
-
-import {
-  SkyProgressIndicatorMessageType
-} from './progress-indicator-message-type';
 
 @Component({
   selector: 'sky-progress-indicator',

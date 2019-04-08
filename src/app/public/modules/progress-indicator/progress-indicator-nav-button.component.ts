@@ -7,15 +7,18 @@ import {
   OnDestroy
 } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import {
+  Subject
+} from 'rxjs/Subject';
 
 import 'rxjs/add/operator/distinctUntilChanged';
 
 import 'rxjs/add/operator/takeUntil';
 
-import { SkyProgressIndicatorChange } from './progress-indicator-change';
-import { SkyProgressIndicatorMessageType } from './progress-indicator-message-type';
-import { SkyProgressIndicatorNavButtonType } from './progress-indicator-nav-button-type';
+import { SkyProgressIndicatorChange } from './types/progress-indicator-change';
+import { SkyProgressIndicatorMessageType } from './types/progress-indicator-message-type';
+import { SkyProgressIndicatorNavButtonType } from './types/progress-indicator-nav-button-type';
+
 import { SkyProgressIndicatorComponent } from './progress-indicator.component';
 
 @Component({
