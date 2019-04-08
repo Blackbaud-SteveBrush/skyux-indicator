@@ -8,22 +8,15 @@
 }
 
 .sky-progress-indicator-item-main {
-  flex: 1 1 auto;
+  flex: 1 1 100%;
 }
 
 .sky-progress-indicator-item-content {
   min-height: $sky-margin-double;
   padding-top: $sky-margin;
   padding-bottom: $sky-margin-triple;
-  text-align: center;
-
-  // Accommodate the width of the timeline to make the content centered.
-  margin-left: -$timeline-width * 2;
 }
 
-/**
- * STATUS
- */
 .sky-progress-indicator-item-status-incomplete {
   // Incomplete items should have reduced height.
   .sky-progress-indicator-item-content {

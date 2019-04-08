@@ -8,14 +8,28 @@ import {
 import {
   SkyProgressIndicatorItemStatus
 } from './progress-indicator-item-status';
+import { SkyProgressIndicatorDisplayMode } from './progress-indicator-display-mode';
 
 @Component({
-  selector: 'sky-progress-indicator-timeline',
-  templateUrl: './progress-indicator-timeline.component.html',
-  styleUrls: ['./progress-indicator-timeline.component.scss'],
+  selector: 'sky-progress-indicator-status-marker',
+  templateUrl: './progress-indicator-status-marker.component.html',
+  styleUrls: ['./progress-indicator-status-marker.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SkyProgressIndicatorTimelineComponent {
+export class SkyProgressIndicatorStatusMarkerComponent {
+  @Input()
+  public set displayMode(value: SkyProgressIndicatorDisplayMode) {
+    this._displayMode = value;
+  }
+
+  public get displayMode(): SkyProgressIndicatorDisplayMode {
+    if (this._displayMode === undefined) {
+      return SkyProgressIndicatorDisplayMode.Vertical;
+    }
+
+    return this._displayMode;
+  }
+
   @Input()
   public set status(value: SkyProgressIndicatorItemStatus) {
     if (value === this._status) {
@@ -36,7 +50,8 @@ export class SkyProgressIndicatorTimelineComponent {
 
   public get cssClassNames(): string {
     const classNames = [
-      `sky-progress-indicator-timeline-status-${this.statusName}`
+      `sky-progress-indicator-status-marker-mode-${this.displayModeName}`,
+      `sky-progress-indicator-status-marker-status-${this.statusName}`
     ];
 
     return classNames.join(' ');
@@ -70,6 +85,15 @@ export class SkyProgressIndicatorTimelineComponent {
     return name;
   }
 
+  public get displayModeName(): string {
+    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
+      return 'vertical';
+    }
+
+    return 'horizontal';
+  }
+
+  private _displayMode: SkyProgressIndicatorDisplayMode;
   private _status: SkyProgressIndicatorItemStatus;
 
   constructor(

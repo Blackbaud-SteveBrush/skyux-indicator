@@ -1,6 +1,6 @@
 export const enum SkyProgressIndicatorItemStatus {
-  Incomplete = 0,
-  Active,
-  Pending,
-  Complete
+  Active = 0,
+  Complete,
+  Incomplete,
+  Pending
 }

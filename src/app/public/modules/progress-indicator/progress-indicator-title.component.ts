@@ -9,4 +9,4 @@ import {
   styleUrls: ['./progress-indicator-title.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SkyProgressIndicatorTitleComponent {}
+export class SkyProgressIndicatorTitleComponent { }

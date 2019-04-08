@@ -35,8 +35,8 @@ import {
 } from './progress-indicator-reset-button.component';
 
 import {
-  SkyProgressIndicatorTimelineComponent
-} from './progress-indicator-timeline.component';
+  SkyProgressIndicatorStatusMarkerComponent
+} from './progress-indicator-status-marker.component';
 
 import {
   SkyProgressIndicatorTitleComponent
@@ -48,7 +48,7 @@ import {
     SkyProgressIndicatorItemComponent,
     SkyProgressIndicatorNavButtonComponent,
     SkyProgressIndicatorResetButtonComponent,
-    SkyProgressIndicatorTimelineComponent,
+    SkyProgressIndicatorStatusMarkerComponent,
     SkyProgressIndicatorTitleComponent
   ],
   imports: [
@@ -62,7 +62,7 @@ import {
     SkyProgressIndicatorItemComponent,
     SkyProgressIndicatorNavButtonComponent,
     SkyProgressIndicatorResetButtonComponent,
-    SkyProgressIndicatorTimelineComponent,
+    SkyProgressIndicatorStatusMarkerComponent,
     SkyProgressIndicatorTitleComponent
   ]
 })

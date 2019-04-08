@@ -4,12 +4,15 @@ import {
 
 export interface SkyProgressIndicatorMessage {
   type: SkyProgressIndicatorMessageType;
+
   data?: {
     /**
      * Used in conjunction with SkyProgressIndicatorMessageType.GoTo
-     * to travel to a specific step by a specified index number.
+     * to travel to a specific step by specifying an index number.
      */
     stepIndex?: number;
+
+    // Allow any other data to be passed.
     [key: string]: any;
   };
 }

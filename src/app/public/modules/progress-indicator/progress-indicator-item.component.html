@@ -1,13 +1,15 @@
 <div *ngIf="isVisible"
   class="sky-progress-indicator-item"
-  [ngClass]="cssClassNames"
+  [ngClass]="'sky-progress-indicator-item-status-' + statusName"
 >
-  <sky-progress-indicator-timeline *ngIf="showTimeline"
+  <sky-progress-indicator-status-marker *ngIf="showStatusMarker"
     [status]="status"
   >
-  </sky-progress-indicator-timeline>
+  </sky-progress-indicator-status-marker>
 
-  <div class="sky-progress-indicator-item-main">
+  <div
+    class="sky-progress-indicator-item-main"
+  >
     <div
       class="sky-progress-indicator-item-title"
       role="heading"

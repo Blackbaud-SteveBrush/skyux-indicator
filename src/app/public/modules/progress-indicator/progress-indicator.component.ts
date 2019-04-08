@@ -8,16 +8,32 @@ import {
   Input,
   SimpleChanges,
   OnChanges,
-  Output
+  Output,
+  ChangeDetectorRef,
+  OnDestroy
 } from '@angular/core';
+
+import {
+  Observable
+} from 'rxjs/Observable';
 
 import {
   Subject
 } from 'rxjs/Subject';
 
+import 'rxjs/add/operator/takeUntil';
+
 import {
   SkyProgressIndicatorChange
 } from './progress-indicator-change';
+
+import {
+  SkyProgressIndicatorDisplayMode
+} from './progress-indicator-display-mode';
+
+import {
+  SkyProgressIndicatorItemStatus
+} from './progress-indicator-item-status';
 
 import {
   SkyProgressIndicatorItemComponent
@@ -30,9 +46,6 @@ import {
 import {
   SkyProgressIndicatorMessageType
 } from './progress-indicator-message-type';
-import { Observable } from 'rxjs';
-import { SkyProgressIndicatorDisplayMode } from './progress-indicator-display-mode';
-import { SkyProgressIndicatorItemStatus } from './progress-indicator-item-status';
 
 @Component({
   selector: 'sky-progress-indicator',
@@ -41,7 +54,7 @@ import { SkyProgressIndicatorItemStatus } from './progress-indicator-item-status
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SkyProgressIndicatorComponent
-  implements OnInit, AfterContentInit, OnChanges {
+  implements OnInit, AfterContentInit, OnChanges, OnDestroy {
 
   @Input()
   public set displayMode(value: SkyProgressIndicatorDisplayMode) {
@@ -102,6 +115,14 @@ export class SkyProgressIndicatorComponent
     return classNames.join(' ');
   }
 
+  public get displayModeName(): string {
+    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
+      return 'vertical';
+    }
+
+    return 'horizontal';
+  }
+
   // This field was added to support legacy API.
   public get hasFinishButton(): boolean {
     return this._hasFinishButton || false;
@@ -115,6 +136,8 @@ export class SkyProgressIndicatorComponent
     return this.itemComponents.length;
   }
 
+  public itemStatuses: SkyProgressIndicatorItemStatus[] = [];
+
   @ContentChildren(SkyProgressIndicatorItemComponent)
   private itemComponents: QueryList<SkyProgressIndicatorItemComponent>;
 
@@ -126,13 +149,7 @@ export class SkyProgressIndicatorComponent
     this._activeIndex = value;
   }
 
-  private get displayModeName(): string {
-    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
-      return 'vertical';
-    }
-
-    return 'horizontal';
-  }
+  private ngUnsubscribe = new Subject<void>();
 
   private _activeIndex: number;
   private _displayMode: SkyProgressIndicatorDisplayMode;
@@ -141,20 +158,38 @@ export class SkyProgressIndicatorComponent
   private _isPassive: boolean;
   private _startingIndex = 0;
 
+  constructor(
+    private changeDetector: ChangeDetectorRef
+  ) { }
+
   public ngOnInit(): void {
     this.activeIndex = this.startingIndex;
 
-    this.messageStream.subscribe((message) => {
-      this.handleIncomingMessage(message);
-    });
+    this.messageStream
+      .takeUntil(this.ngUnsubscribe)
+      .subscribe((message) => {
+        this.handleIncomingMessage(message);
+      });
   }
 
   public ngAfterContentInit(): void {
     if (!this.hasFinishButton && this._finished.observers.length) {
-      throw 'You need to use the finish button if you want to subscribe to that event!';
+      console.warn(
+        'You need to use the finish button if you want to subscribe to that event!'
+      );
     }
 
     this.updateSteps();
+
+    // Update the status markers when progress changes.
+    // TODO: Put this in a separate `horizontal-status-markers` component?
+    this.progressChanges
+      .takeUntil(this.ngUnsubscribe)
+      .subscribe(() => {
+        this.itemStatuses = this.itemComponents.map(c => c.status);
+        this.changeDetector.markForCheck();
+      });
+
     this.notifyChange();
   }
 
@@ -168,6 +203,11 @@ export class SkyProgressIndicatorComponent
     }
   }
 
+  public ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
   private goNextStep(): void {
     this.activeIndex++;
 
@@ -177,8 +217,8 @@ export class SkyProgressIndicatorComponent
       return;
     }
 
-    this.notifyChange();
     this.updateSteps();
+    this.notifyChange();
   }
 
   private goPreviousStep(): void {
@@ -189,14 +229,14 @@ export class SkyProgressIndicatorComponent
       return;
     }
 
-    this.notifyChange();
     this.updateSteps();
+    this.notifyChange();
   }
 
   private gotoStep(index: number): void {
     this.activeIndex = index;
-    this.notifyChange();
     this.updateSteps();
+    this.notifyChange();
   }
 
   private finishSteps(): void {
@@ -204,13 +244,14 @@ export class SkyProgressIndicatorComponent
       component.status = SkyProgressIndicatorItemStatus.Complete;
     });
 
+    this.notifyChange();
     this._finished.next();
   }
 
   private resetSteps(): void {
     this.activeIndex = 0;
-    this.notifyChange();
     this.updateSteps();
+    this.notifyChange();
   }
 
   private updateSteps(): void {
@@ -239,14 +280,14 @@ export class SkyProgressIndicatorComponent
         component.status = SkyProgressIndicatorItemStatus.Incomplete;
       }
 
-      // Show or hide the timeline graphic.
-      component.showTimeline = isVertical;
+      // Show or hide the status markers.
+      component.showStatusMarker = isVertical;
 
       // Show or hide the step number.
-      if (isVertical && !isPassive) {
-        component.showStepNumber(i + 1);
-      } else {
+      if (isPassive) {
         component.hideStepNumber();
+      } else {
+        component.showStepNumber(i + 1);
       }
 
       // If we're in passive mode, don't show titles for incomplete items.
@@ -258,13 +299,13 @@ export class SkyProgressIndicatorComponent
   }
 
   private handleIncomingMessage(message: SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType): void {
-    let type: SkyProgressIndicatorMessageType;
     const value: any = message;
+
+    let type: SkyProgressIndicatorMessageType;
     if (value.type === undefined) {
       console.warn(
         'Send messages with SkyProgressIndicatorMessage instead!'
       );
-
       type = value;
     } else {
       type = value.type;
@@ -272,34 +313,34 @@ export class SkyProgressIndicatorComponent
 
     switch (type) {
       case SkyProgressIndicatorMessageType.Finish:
-      this.finishSteps();
-      break;
+        this.finishSteps();
+        break;
 
       case SkyProgressIndicatorMessageType.Progress:
-      this.goNextStep();
-      break;
+        this.goNextStep();
+        break;
 
       case SkyProgressIndicatorMessageType.Regress:
-      this.goPreviousStep();
-      break;
+        this.goPreviousStep();
+        break;
 
       case SkyProgressIndicatorMessageType.Reset:
-      this.resetSteps();
-      break;
+        this.resetSteps();
+        break;
 
       case SkyProgressIndicatorMessageType.GoTo:
-      if (!value.data || value.data.stepIndex === undefined) {
-        console.warn(
-          'Please provide a step index to travel to!'
-        );
-        return;
-      }
+        if (!value.data || value.data.stepIndex === undefined) {
+          console.warn(
+            'Please provide a step index to travel to!'
+          );
+          return;
+        }
 
-      this.gotoStep(value.data.stepIndex);
-      break;
+        this.gotoStep(value.data.stepIndex);
+        break;
 
       default:
-      break;
+        break;
     }
   }
 

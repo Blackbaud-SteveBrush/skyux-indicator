@@ -19,27 +19,6 @@ export class SkyProgressIndicatorItemComponent {
   @Input()
   public title: string;
 
-  public get cssClassNames(): string {
-    const classNames = [
-      `sky-progress-indicator-item-status-${this.statusName}`
-    ];
-
-    return classNames.join(' ');
-  }
-
-  public set isVisible(value: boolean) {
-    if (value === this._isVisible) {
-      return;
-    }
-
-    this._isVisible = value;
-    this.changeDetector.markForCheck();
-  }
-
-  public get isVisible(): boolean {
-    return this._isVisible || false;
-  }
-
   public set status(value: SkyProgressIndicatorItemStatus) {
     if (value === this._status) {
       return;
@@ -55,19 +34,6 @@ export class SkyProgressIndicatorItemComponent {
     }
 
     return this._status;
-  }
-
-  public get titlePrefix(): string {
-    return this._titlePrefix || '';
-  }
-
-  public set titlePrefix(value: string) {
-    if (value === this._titlePrefix) {
-      return;
-    }
-
-    this._titlePrefix = value;
-    this.changeDetector.markForCheck();
   }
 
   public get statusName(): string {
@@ -98,12 +64,12 @@ export class SkyProgressIndicatorItemComponent {
     return name;
   }
 
-  public showTimeline = true;
+  public isVisible = false;
+  public showStatusMarker = true;
   public showTitle = true;
+  public titlePrefix: string;
 
-  private _isVisible: boolean;
   private _status: SkyProgressIndicatorItemStatus;
-  private _titlePrefix: string;
 
   constructor(
     private changeDetector: ChangeDetectorRef

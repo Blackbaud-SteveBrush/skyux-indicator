@@ -3,10 +3,15 @@ import {
   Component,
   Input,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  OnDestroy
 } from '@angular/core';
 
+import { Subject } from 'rxjs/Subject';
+
 import 'rxjs/add/operator/distinctUntilChanged';
+
+import 'rxjs/add/operator/takeUntil';
 
 import { SkyProgressIndicatorChange } from './progress-indicator-change';
 import { SkyProgressIndicatorMessageType } from './progress-indicator-message-type';
@@ -19,7 +24,7 @@ import { SkyProgressIndicatorComponent } from './progress-indicator.component';
   styleUrls: ['./progress-indicator-nav-button.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SkyProgressIndicatorNavButtonComponent implements OnInit {
+export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy {
   @Input()
   public buttonText: string;
 
@@ -74,6 +79,8 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit {
     return this._isVisible || false;
   }
 
+  private ngUnsubscribe = new Subject<void>();
+
   private _buttonType: SkyProgressIndicatorNavButtonType;
   private _disabled: boolean;
   private _isVisible: boolean;
@@ -83,9 +90,10 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-
     if (!this.progressIndicator) {
-      throw 'You must add a progress indicator component!';
+      throw new Error(
+        'You must add a progress indicator component!'
+      );
     }
 
     if (this.buttonType === 'finish') {
@@ -94,6 +102,7 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit {
 
     this.progressIndicator.progressChanges
       .distinctUntilChanged()
+      .takeUntil(this.ngUnsubscribe)
       .subscribe((change: SkyProgressIndicatorChange) => {
         this.disabled = false;
         this.isVisible = true;
@@ -126,6 +135,11 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit {
           return;
         }
       });
+  }
+
+  public ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   public onClick(): void {

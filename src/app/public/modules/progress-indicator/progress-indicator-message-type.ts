@@ -1,7 +1,7 @@
 export const enum SkyProgressIndicatorMessageType {
+  Finish,
+  GoTo,
   Progress,
   Regress,
-  Finish,
-  Reset,
-  GoTo
+  Reset
 }

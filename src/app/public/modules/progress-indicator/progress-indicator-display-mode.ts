@@ -1,4 +1,4 @@
 export const enum SkyProgressIndicatorDisplayMode {
-  Vertical = 0,
-  Horizontal
+  Horizontal = 0,
+  Vertical
 }
