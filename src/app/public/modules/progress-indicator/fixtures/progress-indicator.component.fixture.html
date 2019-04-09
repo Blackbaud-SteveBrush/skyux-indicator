@@ -1,0 +1,63 @@
+<sky-progress-indicator
+  [displayMode]="displayMode"
+  [isPassive]="isPassive"
+  [messageStream]="messageStream"
+  [startingIndex]="startingIndex"
+  (progressChanges)="onProgressChanges($event)"
+  #progressIndicator
+>
+  <sky-progress-indicator-title>
+    Waterfall
+  </sky-progress-indicator-title>
+
+  <sky-progress-indicator-item
+    title="Do the first thing"
+  >
+    Waterfall content 1
+  </sky-progress-indicator-item>
+
+  <sky-progress-indicator-item
+    title="Do the second thing"
+  >
+    Waterfall content 2
+  </sky-progress-indicator-item>
+
+  <sky-progress-indicator-item
+    title="Do the third thing"
+  >
+    Waterfall content 3
+  </sky-progress-indicator-item>
+
+  <sky-progress-indicator-reset-button *ngIf="!showIsolatedLegacyResetButton"
+    [disabled]="disabled"
+    [progressIndicator]="progressIndicatorTemplateRefLegacy"
+    (resetClick)="onResetClick()"
+    #legacyResetButton
+  >
+    Reset (legacy)
+  </sky-progress-indicator-reset-button>
+</sky-progress-indicator>
+
+<sky-progress-indicator-reset-button *ngIf="showIsolatedLegacyResetButton"
+  [progressIndicator]="progressIndicator"
+  (resetClick)="onResetClick()"
+  #legacyIsolatedResetButton
+>
+  Reset (legacy)
+</sky-progress-indicator-reset-button>
+
+<div *ngIf="showNavButtons">
+  <sky-progress-indicator-nav-button
+    [progressIndicator]="progressIndicator"
+    #defaultNavButton
+  >
+  </sky-progress-indicator-nav-button>
+
+  <sky-progress-indicator-nav-button *ngFor="let buttonConfig of buttonConfigs"
+    [buttonText]="buttonConfig.text"
+    [buttonType]="buttonConfig.type"
+    [disabled]="disabled"
+    [progressIndicator]="progressIndicator"
+  >
+  </sky-progress-indicator-nav-button>
+</div>

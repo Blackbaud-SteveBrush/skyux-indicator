@@ -24,23 +24,24 @@ import {
 
 import {
   SkyProgressIndicatorItemComponent
-} from './progress-indicator-item.component';
+} from './/progress-indicator-item/progress-indicator-item.component';
 
 import {
   SkyProgressIndicatorNavButtonComponent
-} from './progress-indicator-nav-button.component';
+} from './progress-indicator-nav-button/progress-indicator-nav-button.component';
 
 import {
   SkyProgressIndicatorResetButtonComponent
-} from './progress-indicator-reset-button.component';
+} from './progress-indicator-reset-button/progress-indicator-reset-button.component';
+
+import {
+  SkyProgressIndicatorTitleComponent
+} from './progress-indicator-title/progress-indicator-title.component';
 
 import {
   SkyProgressIndicatorStatusMarkerComponent
 } from './progress-indicator-status-marker.component';
-
-import {
-  SkyProgressIndicatorTitleComponent
-} from './progress-indicator-title.component';
+import { SkyAppWindowRef } from '@skyux/core';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,9 @@ import {
     SkyProgressIndicatorResetButtonComponent,
     SkyProgressIndicatorStatusMarkerComponent,
     SkyProgressIndicatorTitleComponent
+  ],
+  providers: [
+    SkyAppWindowRef
   ]
 })
 export class SkyProgressIndicatorModule { }

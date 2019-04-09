@@ -5,5 +5,5 @@
   [ngClass]="cssClassNames"
   (click)="onClick()"
 >
-  {{ buttonText || buttonLabelResourceString | skyLibResources }}
+  {{ buttonText || (buttonLabelResourceString | skyLibResources) }}
 </button>

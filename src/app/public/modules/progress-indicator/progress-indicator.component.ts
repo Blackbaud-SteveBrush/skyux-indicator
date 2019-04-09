@@ -6,22 +6,24 @@ import {
   OnInit,
   QueryList,
   Input,
-  SimpleChanges,
-  OnChanges,
   Output,
   ChangeDetectorRef,
   OnDestroy
 } from '@angular/core';
 
 import {
-  Observable
-} from 'rxjs/Observable';
+  SkyAppWindowRef
+} from '@skyux/core';
 
 import {
   Subject
 } from 'rxjs/Subject';
 
 import 'rxjs/add/operator/takeUntil';
+
+import {
+  SkyProgressIndicatorItemComponent
+} from './progress-indicator-item/progress-indicator-item.component';
 
 import {
   SkyProgressIndicatorChange
@@ -43,18 +45,13 @@ import {
   SkyProgressIndicatorMessageType
 } from './types/progress-indicator-message-type';
 
-import {
-  SkyProgressIndicatorItemComponent
-} from './progress-indicator-item.component';
-
 @Component({
   selector: 'sky-progress-indicator',
   templateUrl: './progress-indicator.component.html',
   styleUrls: ['./progress-indicator.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SkyProgressIndicatorComponent
-  implements OnInit, AfterContentInit, OnChanges, OnDestroy {
+export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, OnDestroy {
 
   @Input()
   public set displayMode(value: SkyProgressIndicatorDisplayMode) {
@@ -84,7 +81,11 @@ export class SkyProgressIndicatorComponent
   }
 
   @Input()
-  public messageStream = new Subject<SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType>();
+  public set messageStream(value: Subject<SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType>) {
+    if (value) {
+      this._messageStream = value;
+    }
+  }
 
   @Input()
   public set startingIndex(value: number) {
@@ -98,9 +99,25 @@ export class SkyProgressIndicatorComponent
   @Output()
   public progressChanges = new Subject<SkyProgressIndicatorChange>();
 
-  @Output()
-  public get finished(): Observable<void> {
-    return this._finished;
+  public get activeIndex(): number {
+    return this._activeIndex || 0;
+  }
+
+  public set activeIndex(value: number) {
+    if (value === undefined) {
+      return;
+    }
+
+    const length = this.itemComponents.length;
+    if (value >= length) {
+      value = length - 1;
+    }
+
+    if (value < 0) {
+      value = 0;
+    }
+
+    this._activeIndex = value;
   }
 
   public get cssClassNames(): string {
@@ -141,43 +158,26 @@ export class SkyProgressIndicatorComponent
   @ContentChildren(SkyProgressIndicatorItemComponent)
   private itemComponents: QueryList<SkyProgressIndicatorItemComponent>;
 
-  private get activeIndex(): number {
-    return this._activeIndex;
-  }
-
-  private set activeIndex(value: number) {
-    this._activeIndex = value;
-  }
-
   private ngUnsubscribe = new Subject<void>();
 
   private _activeIndex: number;
   private _displayMode: SkyProgressIndicatorDisplayMode;
-  private _finished = new Subject<void>();
   private _hasFinishButton: boolean;
   private _isPassive: boolean;
-  private _startingIndex = 0;
+  private _messageStream = new Subject<SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType>();
+  private _startingIndex: number;
 
   constructor(
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    private windowRef: SkyAppWindowRef
   ) { }
 
   public ngOnInit(): void {
-    this.activeIndex = this.startingIndex;
-
-    this.messageStream
-      .takeUntil(this.ngUnsubscribe)
-      .subscribe((message) => {
-        this.handleIncomingMessage(message);
-      });
+    this.subscribeToMessageStream();
   }
 
   public ngAfterContentInit(): void {
-    if (!this.hasFinishButton && this._finished.observers.length) {
-      console.warn(
-        'You need to use the finish button if you want to subscribe to that event!'
-      );
-    }
+    this.activeIndex = this.startingIndex;
 
     this.updateSteps();
 
@@ -186,26 +186,23 @@ export class SkyProgressIndicatorComponent
     this.progressChanges
       .takeUntil(this.ngUnsubscribe)
       .subscribe(() => {
-        this.itemStatuses = this.itemComponents.map(c => c.status);
-        this.changeDetector.markForCheck();
+        this.updateItemStatuses();
       });
 
-    this.notifyChange();
-  }
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.startingIndex &&
-      changes.startingIndex.firstChange === false
-    ) {
-      this.activeIndex = this.startingIndex;
-      this.resetSteps();
-    }
+    this.windowRef.nativeWindow.setTimeout(() => {
+      this.notifyChange({
+        activeIndex: this.activeIndex
+      });
+    });
   }
 
   public ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+
+  public sendMessage(message: SkyProgressIndicatorMessage): void {
+    this._messageStream.next(message);
   }
 
   private goNextStep(): void {
@@ -218,7 +215,9 @@ export class SkyProgressIndicatorComponent
     }
 
     this.updateSteps();
-    this.notifyChange();
+    this.notifyChange({
+      activeIndex: this.activeIndex
+    });
   }
 
   private goPreviousStep(): void {
@@ -230,28 +229,38 @@ export class SkyProgressIndicatorComponent
     }
 
     this.updateSteps();
-    this.notifyChange();
+    this.notifyChange({
+      activeIndex: this.activeIndex
+    });
   }
 
   private gotoStep(index: number): void {
     this.activeIndex = index;
     this.updateSteps();
-    this.notifyChange();
+    this.notifyChange({
+      activeIndex: this.activeIndex
+    });
   }
 
   private finishSteps(): void {
+    this.activeIndex = 0;
+
     this.itemComponents.forEach((component) => {
       component.status = SkyProgressIndicatorItemStatus.Complete;
     });
 
-    this.notifyChange();
-    this._finished.next();
+    this.notifyChange({
+      activeIndex: this.activeIndex,
+      isFinished: true
+    });
   }
 
   private resetSteps(): void {
     this.activeIndex = 0;
     this.updateSteps();
-    this.notifyChange();
+    this.notifyChange({
+      activeIndex: this.activeIndex
+    });
   }
 
   private updateSteps(): void {
@@ -304,7 +313,7 @@ export class SkyProgressIndicatorComponent
     let type: SkyProgressIndicatorMessageType;
     if (value.type === undefined) {
       console.warn(
-        'Send messages with SkyProgressIndicatorMessage instead!'
+        'Send messages with `SkyProgressIndicatorMessage` instead!'
       );
       type = value;
     } else {
@@ -329,14 +338,14 @@ export class SkyProgressIndicatorComponent
         break;
 
       case SkyProgressIndicatorMessageType.GoTo:
-        if (!value.data || value.data.stepIndex === undefined) {
+        if (!value.data || value.data.activeIndex === undefined) {
           console.warn(
             'Please provide a step index to travel to!'
           );
           return;
         }
 
-        this.gotoStep(value.data.stepIndex);
+        this.gotoStep(value.data.activeIndex);
         break;
 
       default:
@@ -344,9 +353,20 @@ export class SkyProgressIndicatorComponent
     }
   }
 
-  private notifyChange(): void {
-    this.progressChanges.next({
-      activeIndex: this.activeIndex
-    });
+  private subscribeToMessageStream(): void {
+    this._messageStream
+      .takeUntil(this.ngUnsubscribe)
+      .subscribe((message) => {
+        this.handleIncomingMessage(message);
+      });
+  }
+
+  private notifyChange(change: SkyProgressIndicatorChange): void {
+    this.progressChanges.next(change);
+  }
+
+  private updateItemStatuses(): void {
+    this.itemStatuses = this.itemComponents.map(c => c.status);
+    this.changeDetector.markForCheck();
   }
 }

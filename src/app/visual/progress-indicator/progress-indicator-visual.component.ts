@@ -1,35 +1,73 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   OnInit
 } from '@angular/core';
-import { Subject } from 'rxjs';
-import { SkyProgressIndicatorMessageType } from '../../public';
-import { SkyProgressIndicatorChange } from '../../public';
+
+import { Subject } from 'rxjs/Subject';
+
+import { SkyProgressIndicatorChange, SkyProgressIndicatorMessage, SkyProgressIndicatorMessageType } from '../../public';
 
 @Component({
   selector: 'sky-progress-indicator-visual',
   templateUrl: './progress-indicator-visual.component.html',
-  styleUrls: ['./progress-indicator-visual.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./progress-indicator-visual.component.scss']
 })
 export class SkyProgressIndicatorVisualComponent implements OnInit {
-  public messageStream = new Subject<any>();
-  public messageStreamHorizontal = new Subject<any>();
+  // public buttonConfigs: {
+  //   text: string;
+  //   type: SkyProgressIndicatorNavButtonType;
+  // }[] = [
+  //   {
+  //     text: 'My Finish',
+  //     type: 'finish'
+  //   },
+  //   {
+  //     text: 'My Next',
+  //     type: 'next'
+  //   },
+  //   {
+  //     text: 'My Previous',
+  //     type: 'previous'
+  //   },
+  //   {
+  //     text: 'My Reset',
+  //     type: 'reset'
+  //   }
+  // ];
+
+  public disabled: boolean;
+  public messageStream: Subject<SkyProgressIndicatorMessage>;
+  // public messageStreamHorizontal = new Subject<any>();
+  public startingIndex: number;
 
   public ngOnInit(): void {
+    // setTimeout(() => {
+    //   this.messageStream = new Subject<any>();
+    // }, 1000);
   }
 
-  public onFinished(): void {
-    console.log('Finished!');
+  public setNewMessageStream(): void {
+    if (!this.messageStream) {
+      this.messageStream = new Subject<SkyProgressIndicatorMessage>();
+    }
+  }
+
+  public sendMessage(message: any): void {
+    this.setNewMessageStream();
+
+    setTimeout(() => {
+      this.messageStream.next(message);
+    });
   }
 
   public onPreviousClick(): void {
-    this.messageStream.next(SkyProgressIndicatorMessageType.Regress);
+    this.sendMessage({
+      type: SkyProgressIndicatorMessageType.Regress
+    });
   }
 
   public onNextClick(): void {
-    this.messageStream.next({
+    this.sendMessage({
       type: SkyProgressIndicatorMessageType.Progress
     });
   }
@@ -39,11 +77,15 @@ export class SkyProgressIndicatorVisualComponent implements OnInit {
   }
 
   public onGoToClick(): void {
-    this.messageStream.next({
+    this.sendMessage({
       type: SkyProgressIndicatorMessageType.GoTo,
       data: {
-        stepIndex: 0
+        activeIndex: 0
       }
     });
+  }
+
+  public disableNavButtons(): void {
+    this.disabled = !this.disabled;
   }
 }

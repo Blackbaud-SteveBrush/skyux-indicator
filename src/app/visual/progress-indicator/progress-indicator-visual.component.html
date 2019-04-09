@@ -5,8 +5,7 @@
 <div>
   <sky-progress-indicator
     [messageStream]="messageStream"
-    [startingIndex]="2"
-    (finished)="onFinished()"
+    [startingIndex]="startingIndex"
     (progressChanges)="onProgressChanges($event)"
     #verticalIndicator
   >
@@ -127,18 +126,21 @@
 
   <sky-progress-indicator-nav-button
     buttonType="previous"
+    [disabled]="disabled"
     [progressIndicator]="horizontalIndicator"
   >
   </sky-progress-indicator-nav-button>
 
   <sky-progress-indicator-nav-button
     buttonType="next"
+    [disabled]="disabled"
     [progressIndicator]="horizontalIndicator"
   >
   </sky-progress-indicator-nav-button>
 
   <sky-progress-indicator-nav-button
     buttonType="finish"
+    [disabled]="disabled"
     [progressIndicator]="horizontalIndicator"
   >
   </sky-progress-indicator-nav-button>
@@ -146,9 +148,25 @@
   <sky-progress-indicator-nav-button
     buttonType="reset"
     buttonText="Erase all settings"
+    [disabled]="disabled"
     [progressIndicator]="horizontalIndicator"
   >
   </sky-progress-indicator-nav-button>
+
+  <sky-progress-indicator-nav-button
+    [progressIndicator]="horizontalIndicator"
+  >
+  </sky-progress-indicator-nav-button>
+
+  <p>
+    <button
+      class="sky-btn sky-btn-default"
+      type="button"
+      (click)="disableNavButtons()"
+    >
+      Disable nav buttons
+    </button>
+  </p>
 </div>
 
 <h2>

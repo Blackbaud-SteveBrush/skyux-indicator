@@ -10,7 +10,7 @@ export interface SkyProgressIndicatorMessage {
      * Used in conjunction with SkyProgressIndicatorMessageType.GoTo
      * to travel to a specific step by specifying an index number.
      */
-    stepIndex?: number;
+    activeIndex?: number;
 
     // Allow any other data to be passed.
     [key: string]: any;

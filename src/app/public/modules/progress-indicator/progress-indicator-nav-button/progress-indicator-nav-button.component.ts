@@ -4,7 +4,9 @@ import {
   Input,
   OnInit,
   ChangeDetectorRef,
-  OnDestroy
+  OnDestroy,
+  AfterViewInit,
+  AfterContentInit
 } from '@angular/core';
 
 import {
@@ -15,11 +17,11 @@ import 'rxjs/add/operator/distinctUntilChanged';
 
 import 'rxjs/add/operator/takeUntil';
 
-import { SkyProgressIndicatorChange } from './types/progress-indicator-change';
-import { SkyProgressIndicatorMessageType } from './types/progress-indicator-message-type';
-import { SkyProgressIndicatorNavButtonType } from './types/progress-indicator-nav-button-type';
+import { SkyProgressIndicatorChange } from '../types/progress-indicator-change';
+import { SkyProgressIndicatorMessageType } from '../types/progress-indicator-message-type';
+import { SkyProgressIndicatorNavButtonType } from '../types/progress-indicator-nav-button-type';
 
-import { SkyProgressIndicatorComponent } from './progress-indicator.component';
+import { SkyProgressIndicatorComponent } from '../progress-indicator.component';
 
 @Component({
   selector: 'sky-progress-indicator-nav-button',
@@ -51,6 +53,24 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
   }
 
   public get disabled(): boolean {
+    const buttonType = this.buttonType;
+    const activeIndex = this.progressIndicator.activeIndex;
+    const isLastStep = (activeIndex === this.progressIndicator.numSteps - 1);
+
+    if (
+      buttonType === 'previous' &&
+      activeIndex === 0
+    ) {
+      return true;
+    }
+
+    if (
+      buttonType === 'next' &&
+      isLastStep
+    ) {
+      return true;
+    }
+
     return this._disabled || false;
   }
 
@@ -58,15 +78,28 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
   public progressIndicator: SkyProgressIndicatorComponent;
 
   public get cssClassNames(): string {
-    if (this.buttonType === 'next' || this.buttonType === 'finish') {
-      return 'sky-btn-primary';
+    const buttonType = this.buttonType;
+
+    const classNames = [
+      `sky-progress-indicator-nav-button-${this.buttonType}`
+    ];
+
+    switch (buttonType) {
+      case 'next':
+      case 'finish':
+        classNames.push('sky-btn-primary');
+        break;
+
+      case 'reset':
+        classNames.push('sky-btn-link');
+        break;
+
+      default:
+        classNames.push('sky-btn-default');
+        break;
     }
 
-    if (this.buttonType === 'reset') {
-      return 'sky-btn-link';
-    }
-
-    return 'sky-btn-default';
+    return classNames.join(' ');
   }
 
   public get buttonLabelResourceString(): string {
@@ -107,37 +140,10 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
       .distinctUntilChanged()
       .takeUntil(this.ngUnsubscribe)
       .subscribe((change: SkyProgressIndicatorChange) => {
-        this.disabled = false;
-        this.isVisible = true;
-
-        const isLastStep = (change.activeIndex === this.progressIndicator.numSteps - 1);
-
-        // The finish button should default to being disabled.
-        if (this.buttonType === 'finish') {
-          this.isVisible = (isLastStep);
-          return;
-        }
-
-        if (
-          this.buttonType === 'previous' &&
-          change.activeIndex === 0
-        ) {
-          this.disabled = true;
-          return;
-        }
-
-        if (
-          this.buttonType === 'next' &&
-          isLastStep
-        ) {
-          if (this.progressIndicator.hasFinishButton) {
-            this.isVisible = false;
-          }
-
-          this.disabled = true;
-          return;
-        }
+        this.updateButtonVisibility(change.activeIndex);
       });
+
+    // this.updateButton(this.progressIndicator.startingIndex || 0);
   }
 
   public ngOnDestroy(): void {
@@ -169,8 +175,29 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
       break;
     }
 
-    this.progressIndicator.messageStream.next({
+    this.progressIndicator.sendMessage({
       type
     });
+  }
+
+  private updateButtonVisibility(activeIndex: number): void {
+    this.isVisible = true;
+
+    const isLastStep = (activeIndex === this.progressIndicator.numSteps - 1);
+    const buttonType = this.buttonType;
+
+    // The finish button should default to being disabled.
+    if (buttonType === 'finish') {
+      this.isVisible = isLastStep;
+      return;
+    }
+
+    if (
+      buttonType === 'next' &&
+      isLastStep &&
+      this.progressIndicator.hasFinishButton
+    ) {
+      this.isVisible = false;
+    }
   }
 }

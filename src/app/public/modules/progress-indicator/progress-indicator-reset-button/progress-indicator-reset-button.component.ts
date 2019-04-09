@@ -12,11 +12,11 @@ import {
 
 import {
   SkyProgressIndicatorMessageType
-} from './types/progress-indicator-message-type';
+} from '../types/progress-indicator-message-type';
 
 import {
   SkyProgressIndicatorComponent
-} from './progress-indicator.component';
+} from '../progress-indicator.component';
 
 @Component({
   selector: 'sky-progress-indicator-reset-button',
@@ -38,18 +38,16 @@ export class SkyProgressIndicatorResetButtonComponent implements OnDestroy, OnIn
 
   @Input()
   public set progressIndicator(value: SkyProgressIndicatorComponent) {
-    console.warn(
-      'This component is designed to be located inside the progress indicator component.' +
-      'If it is, you can remove the `[progressIndicator]` property.' +
-      'If you need a reset button located outside of the progress indicator component ' +
-      'Use the progress indicator button instead.'
-    );
+    if (value) {
+      console.warn(
+        'This component is designed to be located inside the progress indicator component.' +
+        'If it is, you can remove the `[progressIndicator]` property.' +
+        'If you need a reset button located outside of the progress indicator component ' +
+        'Use the progress indicator button instead.'
+      );
+    }
 
     this._progressIndicator = value;
-  }
-
-  public get progressIndicator(): SkyProgressIndicatorComponent {
-    return this._progressIndicator;
   }
 
   @Output()
@@ -76,7 +74,7 @@ export class SkyProgressIndicatorResetButtonComponent implements OnDestroy, OnIn
   public resetProgress(): void {
     this.resetClick.emit();
 
-    this.progressIndicator.messageStream.next({
+    this._progressIndicator.sendMessage({
       type: SkyProgressIndicatorMessageType.Reset
     });
   }
