@@ -99,11 +99,11 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   @Output()
   public progressChanges = new Subject<SkyProgressIndicatorChange>();
 
-  public get activeIndex(): number {
+  private get activeIndex(): number {
     return this._activeIndex || 0;
   }
 
-  public set activeIndex(value: number) {
+  private set activeIndex(value: number) {
     if (value === undefined) {
       return;
     }
@@ -149,11 +149,13 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this._hasFinishButton = value;
   }
 
-  public get numSteps(): number {
-    return this.itemComponents.length;
-  }
+  // public get numSteps(): number {
+  //   return this.itemComponents.length;
+  // }
 
-  public itemStatuses: SkyProgressIndicatorItemStatus[] = [];
+  public get itemStatuses(): SkyProgressIndicatorItemStatus[] {
+    return this._itemStatuses || [];
+  }
 
   @ContentChildren(SkyProgressIndicatorItemComponent)
   private itemComponents: QueryList<SkyProgressIndicatorItemComponent>;
@@ -164,6 +166,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   private _displayMode: SkyProgressIndicatorDisplayMode;
   private _hasFinishButton: boolean;
   private _isPassive: boolean;
+  private _itemStatuses: SkyProgressIndicatorItemStatus[];
   private _messageStream = new Subject<SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType>();
   private _startingIndex: number;
 
@@ -191,7 +194,8 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
     this.windowRef.nativeWindow.setTimeout(() => {
       this.notifyChange({
-        activeIndex: this.activeIndex
+        activeIndex: this.activeIndex,
+        itemStatuses: this.itemStatuses
       });
     });
   }
@@ -216,7 +220,8 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
     this.updateSteps();
     this.notifyChange({
-      activeIndex: this.activeIndex
+      activeIndex: this.activeIndex,
+      itemStatuses: this.itemStatuses
     });
   }
 
@@ -230,7 +235,8 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
     this.updateSteps();
     this.notifyChange({
-      activeIndex: this.activeIndex
+      activeIndex: this.activeIndex,
+      itemStatuses: this.itemStatuses
     });
   }
 
@@ -238,7 +244,8 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this.activeIndex = index;
     this.updateSteps();
     this.notifyChange({
-      activeIndex: this.activeIndex
+      activeIndex: this.activeIndex,
+      itemStatuses: this.itemStatuses
     });
   }
 
@@ -251,6 +258,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
     this.notifyChange({
       activeIndex: this.activeIndex,
+      itemStatuses: this.itemStatuses,
       isFinished: true
     });
   }
@@ -259,7 +267,8 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this.activeIndex = 0;
     this.updateSteps();
     this.notifyChange({
-      activeIndex: this.activeIndex
+      activeIndex: this.activeIndex,
+      itemStatuses: this.itemStatuses
     });
   }
 
@@ -309,6 +318,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
   private handleIncomingMessage(message: SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType): void {
     const value: any = message;
+    console.log('handleIncomingMessage()', message);
 
     let type: SkyProgressIndicatorMessageType;
     if (value.type === undefined) {
@@ -366,7 +376,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   }
 
   private updateItemStatuses(): void {
-    this.itemStatuses = this.itemComponents.map(c => c.status);
+    this._itemStatuses = this.itemComponents.map(c => c.status);
     this.changeDetector.markForCheck();
   }
 }

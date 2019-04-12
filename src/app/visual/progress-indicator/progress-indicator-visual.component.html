@@ -1,4 +1,4 @@
-<h2>
+<!-- <h2>
   Vertical mode (default)
 </h2>
 
@@ -86,7 +86,7 @@
       Goto first
     </button>
   </p>
-</div>
+</div> -->
 
 <h2>
   Horizontal mode
@@ -96,7 +96,6 @@
   <sky-progress-indicator
     displayMode="horizontal"
     [messageStream]="messageStreamHorizontal"
-    (finished)="onFinished()"
     #horizontalIndicator
   >
     <sky-progress-indicator-item
@@ -153,10 +152,11 @@
   >
   </sky-progress-indicator-nav-button>
 
-  <sky-progress-indicator-nav-button
+  <!-- DEFAULT -->
+  <!-- <sky-progress-indicator-nav-button
     [progressIndicator]="horizontalIndicator"
   >
-  </sky-progress-indicator-nav-button>
+  </sky-progress-indicator-nav-button> -->
 
   <p>
     <button
@@ -168,7 +168,7 @@
     </button>
   </p>
 </div>
-
+<!--
 <h2>
   Passive mode
 </h2>
@@ -236,4 +236,4 @@
   [progressIndicator]="verticalIndicator"
 >
   Old reset button
-</sky-progress-indicator-reset-button>
+</sky-progress-indicator-reset-button> -->

@@ -13,51 +13,16 @@ import { SkyProgressIndicatorChange, SkyProgressIndicatorMessage, SkyProgressInd
   styleUrls: ['./progress-indicator-visual.component.scss']
 })
 export class SkyProgressIndicatorVisualComponent implements OnInit {
-  // public buttonConfigs: {
-  //   text: string;
-  //   type: SkyProgressIndicatorNavButtonType;
-  // }[] = [
-  //   {
-  //     text: 'My Finish',
-  //     type: 'finish'
-  //   },
-  //   {
-  //     text: 'My Next',
-  //     type: 'next'
-  //   },
-  //   {
-  //     text: 'My Previous',
-  //     type: 'previous'
-  //   },
-  //   {
-  //     text: 'My Reset',
-  //     type: 'reset'
-  //   }
-  // ];
 
   public disabled: boolean;
-  public messageStream: Subject<SkyProgressIndicatorMessage>;
-  // public messageStreamHorizontal = new Subject<any>();
+  public messageStream = new Subject<SkyProgressIndicatorMessage>();
+  public messageStreamHorizontal = new Subject<any>();
   public startingIndex: number;
 
-  public ngOnInit(): void {
-    // setTimeout(() => {
-    //   this.messageStream = new Subject<any>();
-    // }, 1000);
-  }
-
-  public setNewMessageStream(): void {
-    if (!this.messageStream) {
-      this.messageStream = new Subject<SkyProgressIndicatorMessage>();
-    }
-  }
+  public ngOnInit(): void { }
 
   public sendMessage(message: any): void {
-    this.setNewMessageStream();
-
-    setTimeout(() => {
-      this.messageStream.next(message);
-    });
+    this.messageStream.next(message);
   }
 
   public onPreviousClick(): void {

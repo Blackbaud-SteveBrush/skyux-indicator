@@ -54,8 +54,8 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
 
   public get disabled(): boolean {
     const buttonType = this.buttonType;
-    const activeIndex = this.progressIndicator.activeIndex;
-    const isLastStep = (activeIndex === this.progressIndicator.numSteps - 1);
+    const activeIndex = this.lastProgressChange.activeIndex;
+    const isLastStep = (activeIndex === this.lastProgressChange.itemStatuses.length - 1);
 
     if (
       buttonType === 'previous' &&
@@ -115,6 +115,7 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
     return this._isVisible || false;
   }
 
+  private lastProgressChange: SkyProgressIndicatorChange;
   private ngUnsubscribe = new Subject<void>();
 
   private _buttonType: SkyProgressIndicatorNavButtonType;
@@ -140,10 +141,9 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
       .distinctUntilChanged()
       .takeUntil(this.ngUnsubscribe)
       .subscribe((change: SkyProgressIndicatorChange) => {
-        this.updateButtonVisibility(change.activeIndex);
+        this.lastProgressChange = change;
+        this.updateButtonVisibility(change);
       });
-
-    // this.updateButton(this.progressIndicator.startingIndex || 0);
   }
 
   public ngOnDestroy(): void {
@@ -180,11 +180,14 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
     });
   }
 
-  private updateButtonVisibility(activeIndex: number): void {
-    this.isVisible = true;
-
-    const isLastStep = (activeIndex === this.progressIndicator.numSteps - 1);
+  private updateButtonVisibility(change: SkyProgressIndicatorChange): void {
+    const isLastStep = (change.activeIndex === change.itemStatuses.length - 1);
     const buttonType = this.buttonType;
+
+    if (change.isFinished) {
+      this.isVisible = false;
+      return;
+    }
 
     // The finish button should default to being disabled.
     if (buttonType === 'finish') {
@@ -198,6 +201,9 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
       this.progressIndicator.hasFinishButton
     ) {
       this.isVisible = false;
+      return;
     }
+
+    this.isVisible = true;
   }
 }
