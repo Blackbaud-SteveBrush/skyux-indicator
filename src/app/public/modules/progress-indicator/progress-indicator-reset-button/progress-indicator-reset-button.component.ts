@@ -5,14 +5,12 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  OnInit,
-  Output,
-  Optional
+  Output
 } from '@angular/core';
 
 import {
   SkyProgressIndicatorMessageType
-} from '../types/progress-indicator-message-type';
+} from '../types';
 
 import {
   SkyProgressIndicatorComponent
@@ -24,7 +22,7 @@ import {
   styleUrls: ['./progress-indicator-reset-button.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SkyProgressIndicatorResetButtonComponent implements OnDestroy, OnInit {
+export class SkyProgressIndicatorResetButtonComponent implements OnDestroy {
 
   @Input()
   public set disabled(value: boolean) {
@@ -37,44 +35,33 @@ export class SkyProgressIndicatorResetButtonComponent implements OnDestroy, OnIn
   }
 
   @Input()
-  public set progressIndicator(value: SkyProgressIndicatorComponent) {
-    if (value) {
-      console.warn(
-        'This component is designed to be located inside the progress indicator component.' +
-        'If it is, you can remove the `[progressIndicator]` property.' +
-        'If you need a reset button located outside of the progress indicator component ' +
-        'Use the progress indicator button instead.'
-      );
-    }
-
-    this._progressIndicator = value;
-  }
+  public progressIndicator: SkyProgressIndicatorComponent;
 
   @Output()
   public resetClick = new EventEmitter<any>();
 
   private _disabled: boolean;
-  private _progressIndicator: SkyProgressIndicatorComponent;
 
   constructor(
-    private changeDetector: ChangeDetectorRef,
-    @Optional() private parentComponent: SkyProgressIndicatorComponent
-  ) { }
-
-  public ngOnInit(): void {
-    if (this.parentComponent) {
-      this._progressIndicator = this.parentComponent;
-    }
+    private changeDetector: ChangeDetectorRef
+  ) {
+    console.warn(
+      'The `<sky-progress-indicator-reset-button>` component is deprecated. Please use the following instead:\n' +
+      '<sky-progress-indicator-nav-button\n' +
+      '  [buttonText]="My reset button text"\n' +
+      '  [buttonType]="reset"\n' +
+      '></sky-progress-indicator-nav-button>'
+    );
   }
 
   public ngOnDestroy(): void {
     this.resetClick.complete();
   }
 
-  public resetProgress(): void {
+  public onClick(): void {
     this.resetClick.emit();
 
-    this._progressIndicator.sendMessage({
+    this.progressIndicator.sendMessage({
       type: SkyProgressIndicatorMessageType.Reset
     });
   }

@@ -6,12 +6,9 @@ import {
 } from '@angular/core';
 
 import {
-  SkyProgressIndicatorDisplayMode
-} from './types/progress-indicator-display-mode';
-
-import {
+  SkyProgressIndicatorDisplayMode,
   SkyProgressIndicatorItemStatus
-} from './types/progress-indicator-item-status';
+} from './types';
 
 @Component({
   selector: 'sky-progress-indicator-status-marker',

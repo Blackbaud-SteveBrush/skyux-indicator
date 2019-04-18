@@ -26,24 +26,12 @@ import {
 } from './progress-indicator-item/progress-indicator-item.component';
 
 import {
-  SkyProgressIndicatorChange
-} from './types/progress-indicator-change';
-
-import {
-  SkyProgressIndicatorDisplayMode
-} from './types/progress-indicator-display-mode';
-
-import {
-  SkyProgressIndicatorItemStatus
-} from './types/progress-indicator-item-status';
-
-import {
-  SkyProgressIndicatorMessage
-} from './types/progress-indicator-message';
-
-import {
+  SkyProgressIndicatorChange,
+  SkyProgressIndicatorDisplayMode,
+  SkyProgressIndicatorItemStatus,
+  SkyProgressIndicatorMessage,
   SkyProgressIndicatorMessageType
-} from './types/progress-indicator-message-type';
+} from './types';
 
 @Component({
   selector: 'sky-progress-indicator',
@@ -72,7 +60,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   }
 
   public get isPassive(): boolean {
-    // Passive mode is not supported for horizontal displays.
+    // Currently, passive mode is not supported for horizontal displays.
     if (this.displayMode === SkyProgressIndicatorDisplayMode.Horizontal) {
       return false;
     }
@@ -99,27 +87,6 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   @Output()
   public progressChanges = new Subject<SkyProgressIndicatorChange>();
 
-  private get activeIndex(): number {
-    return this._activeIndex || 0;
-  }
-
-  private set activeIndex(value: number) {
-    if (value === undefined) {
-      return;
-    }
-
-    const length = this.itemComponents.length;
-    if (value >= length) {
-      value = length - 1;
-    }
-
-    if (value < 0) {
-      value = 0;
-    }
-
-    this._activeIndex = value;
-  }
-
   public get cssClassNames(): string {
     const classNames = [
       `sky-progress-indicator-mode-${this.displayModeName}`
@@ -141,6 +108,8 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   }
 
   // This field was added to support legacy API.
+  // Some implementations only include a next button; we cannot
+  // assume that every implementation includes both a finish button and a next button.
   public get hasFinishButton(): boolean {
     return this._hasFinishButton || false;
   }
@@ -149,16 +118,34 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this._hasFinishButton = value;
   }
 
-  // public get numSteps(): number {
-  //   return this.itemComponents.length;
-  // }
-
   public get itemStatuses(): SkyProgressIndicatorItemStatus[] {
     return this._itemStatuses || [];
   }
 
   @ContentChildren(SkyProgressIndicatorItemComponent)
   private itemComponents: QueryList<SkyProgressIndicatorItemComponent>;
+
+  private get activeIndex(): number {
+    return this._activeIndex || 0;
+  }
+
+  private set activeIndex(value: number) {
+    if (value === undefined) {
+      return;
+    }
+
+    const lastIndex = this.itemComponents.length - 1;
+
+    if (value > lastIndex) {
+      value = lastIndex;
+    }
+
+    if (value < 0) {
+      value = 0;
+    }
+
+    this._activeIndex = value;
+  }
 
   private ngUnsubscribe = new Subject<void>();
 
@@ -189,9 +176,12 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this.progressChanges
       .takeUntil(this.ngUnsubscribe)
       .subscribe(() => {
-        this.updateItemStatuses();
+        this._itemStatuses = this.itemComponents.map(c => c.status);
+        this.changeDetector.markForCheck();
       });
 
+    // Wait for item components' change detection to complete
+    // before notifying changes.
     this.windowRef.nativeWindow.setTimeout(() => {
       this.notifyChange({
         activeIndex: this.activeIndex,
@@ -209,67 +199,47 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this._messageStream.next(message);
   }
 
-  private goNextStep(): void {
-    this.activeIndex++;
+  private gotoNextStep(): void {
+    const nextIndex = this.activeIndex + 1;
+    const lastIndex = this.itemComponents.length - 1;
 
-    const length = this.itemComponents.length;
-    if (this.activeIndex === length) {
-      this.activeIndex = length - 1;
+    if (nextIndex > lastIndex) {
       return;
     }
 
-    this.updateSteps();
-    this.notifyChange({
-      activeIndex: this.activeIndex,
-      itemStatuses: this.itemStatuses
-    });
+    this.gotoStep(nextIndex);
   }
 
-  private goPreviousStep(): void {
-    this.activeIndex--;
+  private gotoPreviousStep(): void {
+    const previousIndex = this.activeIndex - 1;
 
-    if (this.activeIndex === -1) {
-      this.activeIndex = 0;
+    if (previousIndex < 0) {
       return;
     }
 
-    this.updateSteps();
-    this.notifyChange({
-      activeIndex: this.activeIndex,
-      itemStatuses: this.itemStatuses
-    });
+    this.gotoStep(previousIndex);
   }
 
   private gotoStep(index: number): void {
     this.activeIndex = index;
     this.updateSteps();
-    this.notifyChange({
-      activeIndex: this.activeIndex,
-      itemStatuses: this.itemStatuses
-    });
+    this.notifyChange();
   }
 
   private finishSteps(): void {
-    this.activeIndex = 0;
+    this.activeIndex = this.itemComponents.length - 1;
 
     this.itemComponents.forEach((component) => {
       component.status = SkyProgressIndicatorItemStatus.Complete;
     });
 
     this.notifyChange({
-      activeIndex: this.activeIndex,
-      itemStatuses: this.itemStatuses,
       isFinished: true
     });
   }
 
   private resetSteps(): void {
-    this.activeIndex = 0;
-    this.updateSteps();
-    this.notifyChange({
-      activeIndex: this.activeIndex,
-      itemStatuses: this.itemStatuses
-    });
+    this.gotoStep(0);
   }
 
   private updateSteps(): void {
@@ -318,12 +288,15 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
   private handleIncomingMessage(message: SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType): void {
     const value: any = message;
-    console.log('handleIncomingMessage()', message);
 
+    // Prints a deprecation warning if the consumer provides only `SkyProgressIndicatorMessageType`.
     let type: SkyProgressIndicatorMessageType;
     if (value.type === undefined) {
       console.warn(
-        'Send messages with `SkyProgressIndicatorMessage` instead!'
+        'The progress indicator component\'s `messageStream` input was ' +
+        'set to `Subject<SkyProgressIndicatorMessageType>`. This is a ' +
+        'deprecated type and will be removed in the next major version release. ' +
+        'Instead, set the `messageStream` input to `Subject<SkyProgressIndicatorMessage>`.'
       );
       type = value;
     } else {
@@ -336,11 +309,11 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
         break;
 
       case SkyProgressIndicatorMessageType.Progress:
-        this.goNextStep();
+        this.gotoNextStep();
         break;
 
       case SkyProgressIndicatorMessageType.Regress:
-        this.goPreviousStep();
+        this.gotoPreviousStep();
         break;
 
       case SkyProgressIndicatorMessageType.Reset:
@@ -348,7 +321,10 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
         break;
 
       case SkyProgressIndicatorMessageType.GoTo:
-        if (!value.data || value.data.activeIndex === undefined) {
+        if (
+          !value.data ||
+          value.data.activeIndex === undefined
+        ) {
           console.warn(
             'Please provide a step index to travel to!'
           );
@@ -371,12 +347,12 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
       });
   }
 
-  private notifyChange(change: SkyProgressIndicatorChange): void {
-    this.progressChanges.next(change);
-  }
-
-  private updateItemStatuses(): void {
-    this._itemStatuses = this.itemComponents.map(c => c.status);
-    this.changeDetector.markForCheck();
+  private notifyChange(change?: SkyProgressIndicatorChange): void {
+    this.progressChanges.next(
+      Object.assign({}, {
+        activeIndex: this.activeIndex,
+        itemStatuses: this.itemStatuses
+      }, change)
+    );
   }
 }

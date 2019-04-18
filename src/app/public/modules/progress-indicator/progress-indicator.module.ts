@@ -7,6 +7,10 @@ import {
 } from '@angular/common';
 
 import {
+  SkyAppWindowRef
+} from '@skyux/core';
+
+import {
   SkyI18nModule
 } from '@skyux/i18n';
 
@@ -24,7 +28,7 @@ import {
 
 import {
   SkyProgressIndicatorItemComponent
-} from './/progress-indicator-item/progress-indicator-item.component';
+} from './progress-indicator-item/progress-indicator-item.component';
 
 import {
   SkyProgressIndicatorNavButtonComponent
@@ -41,7 +45,6 @@ import {
 import {
   SkyProgressIndicatorStatusMarkerComponent
 } from './progress-indicator-status-marker.component';
-import { SkyAppWindowRef } from '@skyux/core';
 
 @NgModule({
   declarations: [

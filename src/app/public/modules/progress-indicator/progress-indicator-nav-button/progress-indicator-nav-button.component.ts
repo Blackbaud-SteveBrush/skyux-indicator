@@ -16,11 +16,15 @@ import 'rxjs/add/operator/distinctUntilChanged';
 
 import 'rxjs/add/operator/takeUntil';
 
-import { SkyProgressIndicatorChange } from '../types/progress-indicator-change';
-import { SkyProgressIndicatorMessageType } from '../types/progress-indicator-message-type';
-import { SkyProgressIndicatorNavButtonType } from '../types/progress-indicator-nav-button-type';
+import {
+  SkyProgressIndicatorChange,
+  SkyProgressIndicatorMessageType,
+  SkyProgressIndicatorNavButtonType
+} from '../types';
 
-import { SkyProgressIndicatorComponent } from '../progress-indicator.component';
+import {
+  SkyProgressIndicatorComponent
+} from '../progress-indicator.component';
 
 @Component({
   selector: 'sky-progress-indicator-nav-button',
@@ -127,13 +131,13 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
   ) { }
 
   public ngOnInit(): void {
-    if (!this.progressIndicator && !this.parentComponent) {
-      throw new Error(
-        'You must add a progress indicator component!'
-      );
-    }
-
     if (!this.progressIndicator) {
+      if (!this.parentComponent) {
+        throw new Error(
+          'You must add a progress indicator component!'
+        );
+      }
+
       this.progressIndicator = this.parentComponent;
     }
 
@@ -188,17 +192,22 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
     const isLastStep = (change.activeIndex === change.itemStatuses.length - 1);
     const buttonType = this.buttonType;
 
-    if (buttonType !== 'reset' && change.isFinished) {
+    // Hide the button if all steps are complete
+    // (except for the reset button)
+    if (
+      buttonType !== 'reset' &&
+      change.isFinished
+    ) {
       this.isVisible = false;
       return;
     }
 
-    // The finish button should default to being disabled.
     if (buttonType === 'finish') {
       this.isVisible = isLastStep;
       return;
     }
 
+    // Hide the next button on the last step only if a finish button exists.
     if (
       buttonType === 'next' &&
       isLastStep &&

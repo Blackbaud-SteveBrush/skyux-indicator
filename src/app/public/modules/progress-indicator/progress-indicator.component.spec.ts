@@ -29,9 +29,6 @@ import { SkyProgressIndicatorComponent } from './progress-indicator.component';
 
 import { SkyProgressIndicatorItemStatus } from './types/progress-indicator-item-status';
 import { SkyProgressIndicatorNavButtonType } from './types/progress-indicator-nav-button-type';
-import { ElementRef } from '@angular/core';
-import { SkyProgressIndicatorNavButtonComponent } from './progress-indicator-nav-button/progress-indicator-nav-button.component';
-import { Subject } from 'rxjs';
 
 describe('Progress indicator component', function () {
   let fixture: ComponentFixture<SkyProgressIndicatorFixtureComponent>;
@@ -74,7 +71,7 @@ describe('Progress indicator component', function () {
   }
 
   function verifyActiveIndex(index: number): void {
-    expect(progressIndicator.activeIndex).toBe(index);
+    expect(progressIndicator['activeIndex']).toBe(index);
   }
 
   function getNavButtonElement(type: SkyProgressIndicatorNavButtonType): any {

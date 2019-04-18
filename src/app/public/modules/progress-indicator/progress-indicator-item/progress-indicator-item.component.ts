@@ -7,7 +7,7 @@ import {
 
 import {
   SkyProgressIndicatorItemStatus
-} from '../types/progress-indicator-item-status';
+} from '../types';
 
 @Component({
   selector: 'sky-progress-indicator-item',
@@ -16,6 +16,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SkyProgressIndicatorItemComponent {
+
   @Input()
   public title: string;
 
