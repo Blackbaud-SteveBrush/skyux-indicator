@@ -5,8 +5,7 @@ import {
   OnInit,
   ChangeDetectorRef,
   OnDestroy,
-  AfterViewInit,
-  AfterContentInit
+  Optional
 } from '@angular/core';
 
 import {
@@ -123,14 +122,19 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
   private _isVisible: boolean;
 
   constructor(
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    @Optional() private parentComponent: SkyProgressIndicatorComponent
   ) { }
 
   public ngOnInit(): void {
-    if (!this.progressIndicator) {
+    if (!this.progressIndicator && !this.parentComponent) {
       throw new Error(
         'You must add a progress indicator component!'
       );
+    }
+
+    if (!this.progressIndicator) {
+      this.progressIndicator = this.parentComponent;
     }
 
     if (this.buttonType === 'finish') {
@@ -184,7 +188,7 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
     const isLastStep = (change.activeIndex === change.itemStatuses.length - 1);
     const buttonType = this.buttonType;
 
-    if (change.isFinished) {
+    if (buttonType !== 'reset' && change.isFinished) {
       this.isVisible = false;
       return;
     }
