@@ -28,6 +28,7 @@
     Waterfall content 3
   </sky-progress-indicator-item>
 
+  <!-- Legacy reset button within a progress indicator -->
   <sky-progress-indicator-reset-button *ngIf="!showIsolatedLegacyResetButton"
     [disabled]="disabled"
     [progressIndicator]="progressIndicator"
@@ -36,8 +37,17 @@
   >
     Reset (legacy)
   </sky-progress-indicator-reset-button>
+
+  <!-- Nav button within a progress indicator -->
+  <sky-progress-indicator-nav-button
+    buttonText="Reset"
+    buttonType="reset"
+    class="progress-indicator-fixture-internal-nav-button"
+  >
+  </sky-progress-indicator-nav-button>
 </sky-progress-indicator>
 
+<!-- Legacy reset button outside a progress indicator -->
 <sky-progress-indicator-reset-button *ngIf="showIsolatedLegacyResetButton"
   [progressIndicator]="progressIndicator"
   (resetClick)="onResetClick()"
@@ -46,9 +56,12 @@
   Reset (legacy)
 </sky-progress-indicator-reset-button>
 
-<div *ngIf="showNavButtons">
+<!-- Nav buttons outside a progress indicator -->
+<div *ngIf="showNavButtons"
+  class="progress-indicator-fixture-external-nav-buttons"
+>
   <sky-progress-indicator-nav-button
-    [progressIndicator]="progressIndicator"
+    [progressIndicator]="defaultNavButtonProgressIndicatorRef"
     #defaultNavButton
   >
   </sky-progress-indicator-nav-button>

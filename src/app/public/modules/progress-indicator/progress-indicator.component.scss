@@ -29,7 +29,9 @@
       margin-left: -$status-marker-width * 2;
     }
 
+    sky-progress-indicator-nav-button,
     .sky-progress-indicator-reset-button {
+      display: block;
       text-align: center;
     }
   }

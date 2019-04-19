@@ -77,6 +77,7 @@ export class SkyProgressIndicatorFixtureComponent {
     text?: string;
     type: SkyProgressIndicatorNavButtonType;
   }[];
+  public defaultNavButtonProgressIndicatorRef: SkyProgressIndicatorComponent;
   public lastChange: SkyProgressIndicatorChange;
   public showNavButtons = false;
   public showIsolatedLegacyResetButton = false;
