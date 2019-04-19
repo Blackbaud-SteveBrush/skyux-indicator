@@ -7,7 +7,6 @@ import {
   QueryList,
   Input,
   Output,
-  ChangeDetectorRef,
   OnDestroy
 } from '@angular/core';
 
@@ -119,7 +118,11 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   }
 
   public get itemStatuses(): SkyProgressIndicatorItemStatus[] {
-    return this._itemStatuses || [];
+    if (!this.itemComponents) {
+      return [];
+    }
+
+    return this.itemComponents.map(c => c.status);
   }
 
   @ContentChildren(SkyProgressIndicatorItemComponent)
@@ -153,12 +156,10 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   private _displayMode: SkyProgressIndicatorDisplayMode;
   private _hasFinishButton: boolean;
   private _isPassive: boolean;
-  private _itemStatuses: SkyProgressIndicatorItemStatus[];
   private _messageStream = new Subject<SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType>();
   private _startingIndex: number;
 
   constructor(
-    private changeDetector: ChangeDetectorRef,
     private windowRef: SkyAppWindowRef
   ) { }
 
@@ -171,22 +172,10 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
 
     this.updateSteps();
 
-    // Update the status markers when progress changes.
-    // TODO: Put this in a separate `horizontal-status-markers` component?
-    this.progressChanges
-      .takeUntil(this.ngUnsubscribe)
-      .subscribe(() => {
-        this._itemStatuses = this.itemComponents.map(c => c.status);
-        this.changeDetector.markForCheck();
-      });
-
     // Wait for item components' change detection to complete
     // before notifying changes.
     this.windowRef.nativeWindow.setTimeout(() => {
-      this.notifyChange({
-        activeIndex: this.activeIndex,
-        itemStatuses: this.itemStatuses
-      });
+      this.notifyChange();
     });
   }
 
@@ -289,8 +278,9 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   private handleIncomingMessage(message: SkyProgressIndicatorMessage | SkyProgressIndicatorMessageType): void {
     const value: any = message;
 
-    // Prints a deprecation warning if the consumer provides only `SkyProgressIndicatorMessageType`.
     let type: SkyProgressIndicatorMessageType;
+
+    // Prints a deprecation warning if the consumer provides only `SkyProgressIndicatorMessageType`.
     if (value.type === undefined) {
       console.warn(
         'The progress indicator component\'s `messageStream` input was ' +
@@ -298,6 +288,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
         'deprecated type and will be removed in the next major version release. ' +
         'Instead, set the `messageStream` input to `Subject<SkyProgressIndicatorMessage>`.'
       );
+
       type = value;
     } else {
       type = value.type;

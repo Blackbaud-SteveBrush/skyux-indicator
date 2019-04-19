@@ -1,4 +1,5 @@
 import {
+  async,
   fakeAsync,
   TestBed,
   ComponentFixture,
@@ -10,10 +11,6 @@ import {
 } from '@skyux-sdk/testing';
 
 import {
-  SkyProgressIndicatorMessageType
-} from './types/progress-indicator-message-type';
-
-import {
   SkyProgressIndicatorFixtureComponent
 } from './fixtures/progress-indicator.component.fixture';
 
@@ -22,18 +19,21 @@ import {
 } from './fixtures/progress-indicator.module.fixture';
 
 import {
-  SkyProgressIndicatorDisplayMode
-} from './types/progress-indicator-display-mode';
+  SkyProgressIndicatorDisplayMode,
+  SkyProgressIndicatorItemStatus,
+  SkyProgressIndicatorMessageType,
+  SkyProgressIndicatorNavButtonType
+} from './types';
 
-import { SkyProgressIndicatorComponent } from './progress-indicator.component';
-
-import { SkyProgressIndicatorItemStatus } from './types/progress-indicator-item-status';
-import { SkyProgressIndicatorNavButtonType } from './types/progress-indicator-nav-button-type';
+import {
+  SkyProgressIndicatorComponent
+} from './progress-indicator.component';
 
 describe('Progress indicator component', function () {
   let fixture: ComponentFixture<SkyProgressIndicatorFixtureComponent>;
   let componentInstance: SkyProgressIndicatorFixtureComponent;
   let progressIndicator: SkyProgressIndicatorComponent;
+  let consoleWarnSpy: jasmine.Spy;
 
   function detectChanges(): void {
     fixture.detectChanges();
@@ -71,7 +71,7 @@ describe('Progress indicator component', function () {
   }
 
   function verifyActiveIndex(index: number): void {
-    expect(progressIndicator['activeIndex']).toBe(index);
+    expect(componentInstance.lastChange.activeIndex).toEqual(index);
   }
 
   function getNavButtonElement(type: SkyProgressIndicatorNavButtonType): any {
@@ -102,6 +102,8 @@ describe('Progress indicator component', function () {
     fixture = TestBed.createComponent(SkyProgressIndicatorFixtureComponent);
     componentInstance = fixture.componentInstance;
     progressIndicator = componentInstance.progressIndicator;
+
+    consoleWarnSpy = spyOn(console, 'warn');
   });
 
   it('should set defaults', fakeAsync(function () {
@@ -314,13 +316,11 @@ describe('Progress indicator component', function () {
     }));
 
     it('should warn when goto is called without an active index', fakeAsync(function () {
-      const spy = spyOn(console, 'warn');
-
       detectChanges();
 
       gotoStep(undefined);
 
-      expect(spy).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalled();
     }));
 
     it('should finish all steps', fakeAsync(function () {
@@ -334,7 +334,7 @@ describe('Progress indicator component', function () {
 
       detectChanges();
 
-      verifyActiveIndex(0);
+      verifyActiveIndex(2);
 
       verifyItemStatuses([
         SkyProgressIndicatorItemStatus.Complete,
@@ -343,8 +343,13 @@ describe('Progress indicator component', function () {
       ]);
 
       expect(spy).toHaveBeenCalledWith({
-        activeIndex: 0,
-        isFinished: true
+        activeIndex: 2,
+        isFinished: true,
+        itemStatuses: [
+          SkyProgressIndicatorItemStatus.Complete,
+          SkyProgressIndicatorItemStatus.Complete,
+          SkyProgressIndicatorItemStatus.Complete
+        ]
       });
     }));
 
@@ -396,16 +401,20 @@ describe('Progress indicator component', function () {
       expect(buttonElement.textContent).toContain('Finish');
     }));
 
-    it('should set the button type', fakeAsync(function () {
+    xit('should set the button type and show default text', fakeAsync(function () {
     }));
 
-    it('should hide the next button and show the finish button on the last step', fakeAsync(function () {
+    xit('should navigate between the steps', fakeAsync(function () {
+    }));
+
+    xit('should reset the steps', fakeAsync(function () {
+    }));
+
+    xit('should hide the next button and show the finish button on the last step', fakeAsync(function () {
       // It disables them too!
     }));
 
     it('should throw error if progress indicator not set as an input', fakeAsync(function () {
-      detectChanges();
-
       try {
         componentInstance.defaultNavButtonComponent.progressIndicator = undefined;
         detectChanges();
@@ -416,17 +425,40 @@ describe('Progress indicator component', function () {
     }));
   });
 
+  describe('Accessibility', function () {
+    it('should be accessible', async(function () {
+      fixture.detectChanges();
+      fixture.whenStable().then(() => {
+        expect(fixture.nativeElement).toBeAccessible();
+      });
+    }));
+
+    it('should be accessible in passive mode', async(function () {
+      componentInstance.isPassive = true;
+      fixture.detectChanges();
+      fixture.whenStable().then(() => {
+        expect(fixture.nativeElement).toBeAccessible();
+      });
+    }));
+
+    it('should be accessible with disabled buttons', async(function () {
+      componentInstance.disabled = true;
+      fixture.detectChanges();
+      fixture.whenStable().then(() => {
+        expect(fixture.nativeElement).toBeAccessible();
+      });
+    }));
+  });
+
   describe('Deprecated features', function () {
     it('should warn when message stream called with only the type', fakeAsync(function () {
-      const spy = spyOn(console, 'warn');
-
       detectChanges();
 
       componentInstance.sendMessageLegacy(SkyProgressIndicatorMessageType.Progress);
 
       detectChanges();
 
-      expect(spy).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalled();
 
       verifyActiveIndex(1);
 
@@ -440,13 +472,11 @@ describe('Progress indicator component', function () {
     it('should warn if using template reference variable with legacy reset button', fakeAsync(function () {
       detectChanges();
 
-      const consoleSpy = spyOn(console, 'warn');
-
       componentInstance.progressIndicatorTemplateRefLegacy = componentInstance.progressIndicator;
 
       detectChanges();
 
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalled();
     }));
 
     it('should support legacy reset button located inside progress indicator component', fakeAsync(function () {
@@ -467,7 +497,6 @@ describe('Progress indicator component', function () {
       const resetClickSpy = spyOn(componentInstance, 'onResetClick');
 
       componentInstance.showIsolatedLegacyResetButton = true;
-      // componentInstance.progressIndicatorTemplateRefLegacy = componentInstance.progressIndicator;
 
       detectChanges();
 
@@ -478,146 +507,4 @@ describe('Progress indicator component', function () {
       expect(resetClickSpy).toHaveBeenCalled();
     }));
   });
-
-  // describe('progress indicator nav buttons', () => {
-  //   it('should be able to control progress', fakeAsync(() => {
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     const element = fixture.nativeElement;
-  //     const prevButton = element.querySelector('#previous-btn button');
-  //     const nextButton = element.querySelector('#next-btn button');
-  //     const resetButton = element.querySelector('#reset-btn button');
-
-  //     // next button
-  //     nextButton.click();
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(componentInstance.activeIndex).toBe(1);
-
-  //     const items = getProgressItems();
-  //     verifyItemStatuses(items, [
-  //       SkyProgressIndicatorItemStatus.Complete,
-  //       SkyProgressIndicatorItemStatus.Active,
-  //       SkyProgressIndicatorItemStatus.Incomplete
-  //     ]);
-
-  //     // previous button
-  //     prevButton.click();
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(componentInstance.activeIndex).toBe(0);
-
-  //     verifyItemStatuses(items, [
-  //       SkyProgressIndicatorItemStatus.Active,
-  //       SkyProgressIndicatorItemStatus.Incomplete,
-  //       SkyProgressIndicatorItemStatus.Incomplete
-  //     ]);
-
-  //     nextButton.click();
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     nextButton.click();
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     resetButton.click();
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(componentInstance.activeIndex).toBe(0);
-
-  //     verifyItemStatuses(items, [
-  //       SkyProgressIndicatorItemStatus.Active,
-  //       SkyProgressIndicatorItemStatus.Incomplete,
-  //       SkyProgressIndicatorItemStatus.Incomplete
-  //     ]);
-
-  //     expect(componentInstance.resetWasClicked).toBeTruthy();
-  //   }));
-
-  //   it('should use inputted button type', fakeAsync(() => {
-  //     componentInstance.buttonConfigs[0] = {
-  //       text: 'My next',
-  //       type: 'next'
-  //     };
-
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(componentInstance.navButtons.first.buttonType).toBe('next');
-  //   }));
-
-  //   it('should default button type to next', fakeAsync(() => {
-  //     componentInstance.previousButtonType = undefined;
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(componentInstance.navButtons.first.buttonType).toBe('next');
-  //   }));
-
-  //   it('should use inputted button text', fakeAsync(() => {
-  //     componentInstance.previousButtonText = 'good text';
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(componentInstance.navButtons.first.buttonText).toBe('good text');
-  //   }));
-
-  //   it('should default button text for each button type', fakeAsync(() => {
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     expect(fixture.nativeElement.querySelector('#previous-btn button').innerText.trim()).toBe('Previous');
-  //     expect(fixture.nativeElement.querySelector('#next-btn button').innerText.trim()).toBe('Next');
-  //   }));
-
-  //   it('should use inputted disabled state', fakeAsync(() => {
-  //     componentInstance.disabled = true;
-  //     fixture.detectChanges();
-  //     tick();
-
-  //     // const buttonElements = fixture.nativeElement.querySelectorAll('sky-progress-indicator-nav-button button');
-  //     // const resetButton = fixture.nativeElement.querySelector('#reset-btn button');
-
-  //     // const buttons = componentInstance.navButtons.toArray();
-
-  //     // buttons.forEach((button) => {
-  //     //   expect(button.disabled).toEqual(true);
-  //     // });
-
-  //     // expect(buttonElements[0].disabled).toBeTruthy();
-  //     // expect(buttonElements[1].disabled).toBeTruthy();
-
-  //     // expect(resetButton.disabled).toBeTruthy();
-  //   }));
-
-  //   it('should be accessible', async(() => {
-  //     fixture.detectChanges();
-  //     fixture.whenStable().then(() => {
-  //       expect(fixture.nativeElement).toBeAccessible();
-  //     });
-  //   }));
-
-  //   it('should be accessible in passive mode', async(() => {
-  //     componentInstance.isPassive = true;
-  //     fixture.detectChanges();
-  //     fixture.whenStable().then(() => {
-  //       expect(fixture.nativeElement).toBeAccessible();
-  //     });
-  //   }));
-
-  //   it('should be accessible with disabled buttons', async(() => {
-  //     componentInstance.previousButtonDisabled = true;
-  //     componentInstance.nextButtonDisabled = true;
-  //     componentInstance.resetButtonDisabled = true;
-  //     fixture.detectChanges();
-  //     fixture.whenStable().then(() => {
-  //       expect(fixture.nativeElement).toBeAccessible();
-  //     });
-  //   }));
-  // });
 });

@@ -134,7 +134,16 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
     if (!this.progressIndicator) {
       if (!this.parentComponent) {
         throw new Error(
-          'You must add a progress indicator component!'
+          'The `<sky-progress-indicator-nav-button>` component requires a reference to ' +
+          'the `<sky-progress-indicator>` component it controls. For example:\n' +
+          '<sky-progress-indicator\n' +
+          '  #myProgressIndicator\n' +
+          '>\n' +
+          '</sky-progress-indicator>\n' +
+          '<sky-progress-indicator-nav-button\n' +
+          '  [progressIndicator]="myProgressIndicator"\n' +
+          '>\n' +
+          '</sky-progress-indicator-nav-button>'
         );
       }
 

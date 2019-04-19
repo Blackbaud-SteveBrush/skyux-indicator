@@ -10,15 +10,12 @@
   <div
     class="sky-progress-indicator-item-main"
   >
-    <div
+    <div *ngIf="showTitle"
       class="sky-progress-indicator-item-title"
       role="heading"
       [ngClass]="{ 'sky-deemphasized': statusName === 'pending' }"
     >
-      {{ titlePrefix }}
-      <ng-template [ngIf]="showTitle">
-        {{ title }}
-      </ng-template>
+      {{ titlePrefix }}{{ title }}
     </div>
     <div
       class="sky-progress-indicator-item-content"

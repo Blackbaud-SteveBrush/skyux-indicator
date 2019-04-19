@@ -16,7 +16,8 @@ import {
   SkyProgressIndicatorDisplayMode,
   SkyProgressIndicatorMessage,
   SkyProgressIndicatorMessageType,
-  SkyProgressIndicatorNavButtonType
+  SkyProgressIndicatorNavButtonType,
+  SkyProgressIndicatorChange
 } from '../types';
 
 import { SkyProgressIndicatorItemComponent } from '../progress-indicator-item/progress-indicator-item.component';
@@ -71,30 +72,36 @@ export class SkyProgressIndicatorFixtureComponent {
   // Nav button inputs.
   public disabled: boolean;
 
+  // Template values.
   public buttonConfigs: {
     text?: string;
     type: SkyProgressIndicatorNavButtonType;
-  }[] = [
-    {
-      type: 'finish'
-    },
-    {
-      type: 'next'
-    },
-    {
-      type: 'previous'
-    },
-    {
-      type: 'reset'
-    }
-  ];
-
-  // Template values.
+  }[];
+  public lastChange: SkyProgressIndicatorChange;
   public showNavButtons = false;
   public showIsolatedLegacyResetButton = false;
   public progressIndicatorTemplateRefLegacy: SkyProgressIndicatorComponent;
 
-  public onProgressChanges(): void { }
+  constructor() {
+    this.buttonConfigs = [
+      {
+        type: 'finish'
+      },
+      {
+        type: 'next'
+      },
+      {
+        type: 'previous'
+      },
+      {
+        type: 'reset'
+      }
+    ];
+  }
+
+  public onProgressChanges(change: SkyProgressIndicatorChange): void {
+    this.lastChange = change;
+  }
 
   public onResetClick(): void { }
 

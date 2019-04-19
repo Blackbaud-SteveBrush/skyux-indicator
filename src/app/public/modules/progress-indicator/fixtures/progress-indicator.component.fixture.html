@@ -30,7 +30,7 @@
 
   <sky-progress-indicator-reset-button *ngIf="!showIsolatedLegacyResetButton"
     [disabled]="disabled"
-    [progressIndicator]="progressIndicatorTemplateRefLegacy"
+    [progressIndicator]="progressIndicator"
     (resetClick)="onResetClick()"
     #legacyResetButton
   >
