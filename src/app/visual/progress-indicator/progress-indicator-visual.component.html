@@ -2,8 +2,11 @@
   Vertical mode (default)
 </h2>
 
-<div class="app-screenshot">
+<div
+  class="app-screenshot"
+>
   <sky-progress-indicator
+    id="app-screenshot-display-mode-vertical"
     [messageStream]="messageStream"
     [startingIndex]="startingIndex"
     (progressChanges)="onProgressChanges($event)"
@@ -74,6 +77,7 @@
 
     <button
       class="sky-btn sky-btn-primary"
+      id="app-screenshot-display-mode-vertical-next-button"
       type="button"
       (click)="onNextClick()"
     >
@@ -94,7 +98,10 @@
   Horizontal mode
 </h2>
 
-<div class="app-screenshot">
+<div
+  class="app-screenshot"
+  id="app-screenshot-display-mode-horizontal"
+>
   <sky-progress-indicator
     displayMode="horizontal"
     [messageStream]="messageStreamHorizontal"
@@ -135,6 +142,7 @@
 
   <sky-progress-indicator-nav-button
     buttonType="next"
+    id="app-screenshot-display-mode-horizontal-next-button"
     [disabled]="disabled"
     [progressIndicator]="horizontalIndicator"
   >
@@ -154,17 +162,18 @@
     [progressIndicator]="horizontalIndicator"
   >
   </sky-progress-indicator-nav-button>
-
-  <p>
-    <button
-      class="sky-btn sky-btn-default"
-      type="button"
-      (click)="disableNavButtons()"
-    >
-      Disable nav buttons
-    </button>
-  </p>
 </div>
+
+<p>
+  <button
+    class="sky-btn sky-btn-default"
+    id="app-screenshot-display-mode-horizontal-disable-buttons-button"
+    type="button"
+    (click)="disableNavButtons()"
+  >
+    Disable nav buttons
+  </button>
+</p>
 
 <h2>
   Horizontal mode (no finish button)
@@ -214,11 +223,29 @@
 </div>
 
 <h2>
+  Horizontal mode (modal)
+</h2>
+
+<p>
+  <button
+    class="sky-btn sky-btn-primary"
+    id="app-screenshot-open-modal-button"
+    type="button"
+    (click)="openModal()"
+  >
+    Open modal
+  </button>
+</p>
+
+<h2>
   Passive mode
 </h2>
 
-<div class="app-screenshot">
+<div
+  class="app-screenshot"
+>
   <sky-progress-indicator
+    id="app-screenshot-passive-mode"
     [isPassive]="true"
     [startingIndex]="1"
   >

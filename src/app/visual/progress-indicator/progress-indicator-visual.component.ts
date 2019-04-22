@@ -12,6 +12,8 @@ import {
   SkyProgressIndicatorMessage,
   SkyProgressIndicatorMessageType
 } from '../../public';
+import { SkyModalService } from '@skyux/modals';
+import { ProgressIndicatorWizardDemoComponent } from './progress-indicator-horizontal-visual.component';
 
 @Component({
   selector: 'sky-progress-indicator-visual',
@@ -24,6 +26,10 @@ export class SkyProgressIndicatorVisualComponent implements OnDestroy {
   public messageStream = new Subject<SkyProgressIndicatorMessage>();
   public messageStreamHorizontal = new Subject<any>();
   public startingIndex: number;
+
+  constructor(
+    private modalService: SkyModalService
+  ) { }
 
   public ngOnDestroy(): void {
     this.messageStream.complete();
@@ -61,5 +67,9 @@ export class SkyProgressIndicatorVisualComponent implements OnDestroy {
 
   public sendMessage(message: any): void {
     this.messageStream.next(message);
+  }
+
+  public openModal(): void {
+    this.modalService.open(ProgressIndicatorWizardDemoComponent);
   }
 }
