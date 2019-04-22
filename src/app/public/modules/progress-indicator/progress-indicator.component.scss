@@ -32,7 +32,8 @@
     sky-progress-indicator-nav-button,
     .sky-progress-indicator-reset-button {
       display: block;
-      text-align: center;
+      padding-top: $sky-padding-triple;
+      padding-left: $sky-margin-plus-half;
     }
   }
 }

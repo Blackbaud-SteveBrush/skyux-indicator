@@ -57,10 +57,6 @@
       buttonText="Erase all settings"
     >
     </sky-progress-indicator-nav-button>
-
-    <sky-progress-indicator-reset-button>
-      Erase all settings
-    </sky-progress-indicator-reset-button>
   </sky-progress-indicator>
 
   <h3>
@@ -153,7 +149,7 @@
 
   <sky-progress-indicator-nav-button
     buttonType="reset"
-    buttonText="Erase all settings"
+    buttonText="Start over"
     [disabled]="disabled"
     [progressIndicator]="horizontalIndicator"
   >
@@ -168,6 +164,53 @@
       Disable nav buttons
     </button>
   </p>
+</div>
+
+<h2>
+  Horizontal mode (no finish button)
+</h2>
+
+<div class="app-screenshot">
+  <sky-progress-indicator
+    displayMode="horizontal"
+    #horizontalIndicatorNoFinish
+  >
+    <sky-progress-indicator-item
+      title="Configure connection"
+    >
+      Content 1
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-item
+      title="Select remote server"
+    >
+      Content 2
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-item
+      title="Test connection"
+    >
+      Content 3
+    </sky-progress-indicator-item>
+
+    <sky-progress-indicator-item
+      title="Turn on connection"
+    >
+      Content 4
+    </sky-progress-indicator-item>
+  </sky-progress-indicator>
+
+  <sky-progress-indicator-nav-button
+    buttonType="previous"
+    [progressIndicator]="horizontalIndicatorNoFinish"
+  >
+  </sky-progress-indicator-nav-button>
+
+  <sky-progress-indicator-nav-button
+    buttonType="next"
+    [progressIndicator]="horizontalIndicatorNoFinish"
+  >
+  </sky-progress-indicator-nav-button>
 </div>
 
 <h2>

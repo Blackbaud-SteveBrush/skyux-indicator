@@ -1,4 +1,6 @@
-import { SkyProgressIndicatorItemStatus } from './progress-indicator-item-status';
+import {
+  SkyProgressIndicatorItemStatus
+} from './progress-indicator-item-status';
 
 export interface SkyProgressIndicatorChange {
   activeIndex?: number;

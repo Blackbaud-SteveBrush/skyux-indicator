@@ -45,6 +45,14 @@ export class SkyProgressIndicatorStatusMarkerComponent {
     return classNames.join(' ');
   }
 
+  public get displayModeName(): string {
+    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
+      return 'vertical';
+    }
+
+    return 'horizontal';
+  }
+
   public get statusName(): string {
     let name: string;
 
@@ -68,14 +76,6 @@ export class SkyProgressIndicatorStatusMarkerComponent {
     }
 
     return name;
-  }
-
-  public get displayModeName(): string {
-    if (this.displayMode === SkyProgressIndicatorDisplayMode.Vertical) {
-      return 'vertical';
-    }
-
-    return 'horizontal';
   }
 
   private _displayMode: SkyProgressIndicatorDisplayMode;

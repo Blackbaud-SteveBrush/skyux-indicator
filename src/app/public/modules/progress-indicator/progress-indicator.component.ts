@@ -3,11 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChildren,
-  OnInit,
-  QueryList,
   Input,
+  OnInit,
+  OnDestroy,
   Output,
-  OnDestroy
+  QueryList,
+  ChangeDetectorRef
 } from '@angular/core';
 
 import {
@@ -106,9 +107,6 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     return 'horizontal';
   }
 
-  // This field was added to support legacy API.
-  // Some implementations only include a next button; we cannot
-  // assume that every implementation includes both a finish button and a next button.
   public get hasFinishButton(): boolean {
     return this._hasFinishButton || false;
   }
@@ -122,7 +120,12 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
       return [];
     }
 
-    return this.itemComponents.map(c => c.status);
+    const statuses = this.itemComponents.map(c => c.status);
+
+    // Update the view whenever item statuses change.
+    this.changeDetector.markForCheck();
+
+    return statuses;
   }
 
   @ContentChildren(SkyProgressIndicatorItemComponent)
@@ -156,6 +159,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   private _startingIndex: number;
 
   constructor(
+    private changeDetector: ChangeDetectorRef,
     private windowRef: SkyAppWindowRef
   ) { }
 
@@ -169,7 +173,7 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
     this.updateSteps();
 
     // Wait for item components' change detection to complete
-    // before notifying changes.
+    // before notifying changes to the consumer.
     this.windowRef.nativeWindow.setTimeout(() => {
       this.notifyChange();
     });

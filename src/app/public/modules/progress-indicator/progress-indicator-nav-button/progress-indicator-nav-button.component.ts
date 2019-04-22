@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Input,
-  OnInit,
-  ChangeDetectorRef,
   OnDestroy,
+  OnInit,
   Optional
 } from '@angular/core';
 
@@ -29,7 +29,6 @@ import {
 @Component({
   selector: 'sky-progress-indicator-nav-button',
   templateUrl: './progress-indicator-nav-button.component.html',
-  styleUrls: ['./progress-indicator-nav-button.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy {
@@ -151,6 +150,9 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
     }
 
     if (this.buttonType === 'finish') {
+      // The `hasFinishButton` field was added to support legacy API.
+      // Some implementations only include a next button; we cannot
+      // assume that every implementation includes both a finish button and a next button.
       this.progressIndicator.hasFinishButton = true;
     }
 
