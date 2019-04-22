@@ -151,6 +151,10 @@ describe('Progress indicator component', function () {
     expect(headingElement.textContent.trim()).toEqual('1 - Do the first thing');
   }));
 
+  it('should handle empty progress indicator', fakeAsync(function () {
+    expect(componentInstance.emptyProgressIndicator.itemStatuses).toEqual([]);
+  }));
+
   describe('Passive mode', function () {
     beforeEach(function () {
       componentInstance.isPassive = true;
@@ -523,12 +527,49 @@ describe('Progress indicator component', function () {
       ]);
     }));
 
-    xit('should hide the next button and show the finish button on the last step', fakeAsync(function () {
-      // It disables them too!
+    it('should hide the next button and show the finish button on the last step', fakeAsync(function () {
+      detectChanges();
+
+      let nextButtonElement = getNavButtonElement('next');
+      let finishButtonElement = getNavButtonElement('finish');
+
+      expect(nextButtonElement).toBeTruthy();
+      expect(finishButtonElement).toBeFalsy();
+
+      gotoStep(2);
+      detectChanges();
+
+      nextButtonElement = getNavButtonElement('next');
+      finishButtonElement = getNavButtonElement('finish');
+
+      expect(nextButtonElement).toBeFalsy();
+      expect(finishButtonElement).toBeTruthy();
     }));
 
-    xit('should not hide the next button if the finish button does not exist', fakeAsync(function () {
-      // It disables them too!
+    it('should not hide the next button if the finish button does not exist', fakeAsync(function () {
+      // Create a custom button config that does not include a finish button.
+      componentInstance.buttonConfigs = [
+        {
+          type: 'previous'
+        },
+        {
+          type: 'next'
+        }
+      ];
+
+      detectChanges();
+
+      let nextButtonElement = getNavButtonElement('next');
+
+      expect(nextButtonElement).toBeTruthy();
+
+      gotoStep(2);
+      detectChanges();
+
+      nextButtonElement = getNavButtonElement('next');
+
+      expect(nextButtonElement).toBeTruthy();
+      expect(nextButtonElement.disabled).toBeTruthy();
     }));
 
     it('should throw error if progress indicator not set as an input', fakeAsync(function () {

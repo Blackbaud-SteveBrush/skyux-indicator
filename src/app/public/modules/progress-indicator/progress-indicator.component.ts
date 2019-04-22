@@ -133,10 +133,6 @@ export class SkyProgressIndicatorComponent implements OnInit, AfterContentInit, 
   }
 
   private set activeIndex(value: number) {
-    if (value === undefined) {
-      return;
-    }
-
     const lastIndex = this.itemComponents.length - 1;
 
     if (value > lastIndex) {

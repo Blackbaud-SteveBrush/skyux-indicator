@@ -44,7 +44,7 @@ import {
 
 import {
   SkyProgressIndicatorStatusMarkerComponent
-} from './progress-indicator-status-marker.component';
+} from './progress-indicator-status-marker/progress-indicator-status-marker.component';
 
 @NgModule({
   declarations: [

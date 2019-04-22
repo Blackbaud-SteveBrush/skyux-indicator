@@ -8,7 +8,7 @@ import {
 import {
   SkyProgressIndicatorDisplayMode,
   SkyProgressIndicatorItemStatus
-} from './types';
+} from '../types';
 
 @Component({
   selector: 'sky-progress-indicator-status-marker',
@@ -32,20 +32,8 @@ export class SkyProgressIndicatorStatusMarkerComponent {
 
   @Input()
   public set status(value: SkyProgressIndicatorItemStatus) {
-    if (value === this._status) {
-      return;
-    }
-
     this._status = value;
     this.changeDetector.markForCheck();
-  }
-
-  public get status(): SkyProgressIndicatorItemStatus {
-    if (this._status === undefined) {
-      return SkyProgressIndicatorItemStatus.Incomplete;
-    }
-
-    return this._status;
   }
 
   public get cssClassNames(): string {
@@ -60,7 +48,8 @@ export class SkyProgressIndicatorStatusMarkerComponent {
   public get statusName(): string {
     let name: string;
 
-    switch (this.status) {
+    /* tslint:disable-next-line:switch-default */
+    switch (this._status) {
       case SkyProgressIndicatorItemStatus.Active:
       name = 'active';
       break;
@@ -75,10 +64,6 @@ export class SkyProgressIndicatorStatusMarkerComponent {
 
       case SkyProgressIndicatorItemStatus.Pending:
       name = 'pending';
-      break;
-
-      default:
-      name = 'none';
       break;
     }
 

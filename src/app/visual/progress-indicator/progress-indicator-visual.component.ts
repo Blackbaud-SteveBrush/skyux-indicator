@@ -1,28 +1,33 @@
 import {
   Component,
-  OnInit
+  OnDestroy
 } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
+import {
+  Subject
+} from 'rxjs/Subject';
 
-import { SkyProgressIndicatorChange, SkyProgressIndicatorMessage, SkyProgressIndicatorMessageType } from '../../public';
+import {
+  SkyProgressIndicatorChange,
+  SkyProgressIndicatorMessage,
+  SkyProgressIndicatorMessageType
+} from '../../public';
 
 @Component({
   selector: 'sky-progress-indicator-visual',
   templateUrl: './progress-indicator-visual.component.html',
   styleUrls: ['./progress-indicator-visual.component.scss']
 })
-export class SkyProgressIndicatorVisualComponent implements OnInit {
+export class SkyProgressIndicatorVisualComponent implements OnDestroy {
 
   public disabled: boolean;
   public messageStream = new Subject<SkyProgressIndicatorMessage>();
   public messageStreamHorizontal = new Subject<any>();
   public startingIndex: number;
 
-  public ngOnInit(): void { }
-
-  public sendMessage(message: any): void {
-    this.messageStream.next(message);
+  public ngOnDestroy(): void {
+    this.messageStream.complete();
+    this.messageStreamHorizontal.complete();
   }
 
   public onPreviousClick(): void {
@@ -37,10 +42,6 @@ export class SkyProgressIndicatorVisualComponent implements OnInit {
     });
   }
 
-  public onProgressChanges(changes: SkyProgressIndicatorChange): void {
-    console.log('changes:', changes);
-  }
-
   public onGoToClick(): void {
     this.sendMessage({
       type: SkyProgressIndicatorMessageType.GoTo,
@@ -50,7 +51,15 @@ export class SkyProgressIndicatorVisualComponent implements OnInit {
     });
   }
 
+  public onProgressChanges(change: SkyProgressIndicatorChange): void {
+    console.log('Progress change:', change);
+  }
+
   public disableNavButtons(): void {
     this.disabled = !this.disabled;
+  }
+
+  public sendMessage(message: any): void {
+    this.messageStream.next(message);
   }
 }

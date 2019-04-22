@@ -170,7 +170,6 @@ export class SkyProgressIndicatorNavButtonComponent implements OnInit, OnDestroy
 
   public onClick(): void {
     let type: SkyProgressIndicatorMessageType;
-    console.log('eh?', this.buttonType);
 
     switch (this.buttonType) {
       case 'finish':

@@ -34,6 +34,9 @@ import { SkyProgressIndicatorComponent } from '../progress-indicator.component';
 export class SkyProgressIndicatorFixtureComponent {
 
   @ViewChild(SkyProgressIndicatorComponent)
+  public emptyProgressIndicator: SkyProgressIndicatorComponent;
+
+  @ViewChild(SkyProgressIndicatorComponent)
   public progressIndicator: SkyProgressIndicatorComponent;
 
   @ViewChild('progressIndicator', { read: TemplateRef })

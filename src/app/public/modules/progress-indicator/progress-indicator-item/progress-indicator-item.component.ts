@@ -20,6 +20,10 @@ export class SkyProgressIndicatorItemComponent {
   @Input()
   public title: string;
 
+  public get status(): SkyProgressIndicatorItemStatus {
+    return this._status;
+  }
+
   public set status(value: SkyProgressIndicatorItemStatus) {
     if (value === this._status) {
       return;
@@ -29,17 +33,10 @@ export class SkyProgressIndicatorItemComponent {
     this.changeDetector.markForCheck();
   }
 
-  public get status(): SkyProgressIndicatorItemStatus {
-    if (this._status === undefined) {
-      return SkyProgressIndicatorItemStatus.Incomplete;
-    }
-
-    return this._status;
-  }
-
   public get statusName(): string {
     let name: string;
 
+    /* tslint:disable-next-line:switch-default */
     switch (this.status) {
       case SkyProgressIndicatorItemStatus.Active:
       name = 'active';
@@ -55,10 +52,6 @@ export class SkyProgressIndicatorItemComponent {
 
       case SkyProgressIndicatorItemStatus.Pending:
       name = 'pending';
-      break;
-
-      default:
-      name = 'none';
       break;
     }
 
