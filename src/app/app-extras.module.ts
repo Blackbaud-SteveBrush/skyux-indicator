@@ -3,10 +3,6 @@ import {
 } from '@angular/core';
 
 import {
-  SkyCheckboxModule
-} from '@skyux/forms';
-
-import {
   SkyModalModule
 } from '@skyux/modals';
 
@@ -29,7 +25,6 @@ import {
 @NgModule({
   exports: [
     SkyAppLinkModule,
-    SkyCheckboxModule,
     SkyModalModule,
     SkyPopoverModule,
     SkyProgressIndicatorModule
